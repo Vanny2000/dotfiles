@@ -142,6 +142,18 @@ return {
 					},
 				})
 			end,
+			["cssls"] = function()
+				lspconfig["cssls"].setup({
+					capabilities = capabilities,
+					settings = {
+						css = {
+							lint = {
+								unknownAtRules = "ignore",
+							},
+						},
+					},
+				})
+			end,
 			["lua_ls"] = function()
 				-- configure lua server (with special settings)
 				lspconfig["lua_ls"].setup({
