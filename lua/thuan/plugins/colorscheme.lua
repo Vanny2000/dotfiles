@@ -10,7 +10,7 @@ return {
 					light = "latte",
 					dark = "mocha",
 				},
-				transparent_background = true, -- Disable full transparency
+				transparent_background = true, -- enable full transparency
 				term_colors = true,
 				on_colors = function(colors)
 					colors.bg = "#1E1E2E"

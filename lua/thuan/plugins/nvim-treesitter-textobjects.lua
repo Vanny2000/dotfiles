@@ -105,7 +105,14 @@ return {
 		local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
 
 		-- vim way: ; goes to the direction you were moving.
-		vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
-		vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+		vim.keymap.set({ "n", "x", "o" }, ";", function()
+			ts_repeat_move.repeat_last_move()
+			vim.cmd("normal! zz")
+		end)
+
+		vim.keymap.set({ "n", "x", "o" }, ",", function()
+			ts_repeat_move.repeat_last_move_opposite()
+			vim.cmd("normal! zz")
+		end)
 	end,
 }
