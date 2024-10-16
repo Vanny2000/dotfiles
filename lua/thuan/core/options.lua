@@ -39,6 +39,8 @@ opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 opt.splitright = true -- split vertical window to the right
 opt.splitbelow = true -- split horizontal window to the bottom
 
+-- vitual block
+opt.virtualedit = "block"
 -- turn off swapfile
 opt.swapfile = false
 
