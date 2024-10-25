@@ -49,5 +49,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 	callback = function()
 		vim.api.nvim_set_hl(0, "LineNr", { fg = "#669999" })
 		vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#FFFFFF", bold = true })
+		-- Add this line to change the cursor line color
+		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#2D2B40" })
 	end,
 })
