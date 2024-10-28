@@ -17,7 +17,7 @@ return {
 				function()
 					harpoon:list():add()
 				end,
-				desc = "Add file to Harpoon",
+				desc = "Harpoon Add file",
 			},
 			{
 				"<leader>h",
@@ -26,9 +26,16 @@ return {
 				end,
 				desc = "Harpoon Quick Menu",
 			},
+			{
+				"<leader>hc",
+				function()
+					harpoon:list():clear()
+				end,
+				desc = "Harpoon Clear",
+			},
 		}
 
-		for i = 1, 5 do
+		for i = 1, 3 do
 			table.insert(keys, {
 				"<leader>" .. i,
 				function()
