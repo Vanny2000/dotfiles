@@ -11,6 +11,8 @@ return {
 			-- Enable blame automatically
 			gs.toggle_current_line_blame(true)
 
+			-- Brighten the current line blame
+			vim.cmd([[ highlight GitSignsCurrentLineBlame guifg=#387478]])
 			-- Navigation
 			map("n", "]h", gs.next_hunk, "Next Hunk")
 			map("n", "[h", gs.prev_hunk, "Prev Hunk")
