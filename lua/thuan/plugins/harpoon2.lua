@@ -35,7 +35,7 @@ return {
 			},
 		}
 
-		for i = 1, 3 do
+		for i = 1, 5 do
 			table.insert(keys, {
 				"<leader>" .. i,
 				function()
