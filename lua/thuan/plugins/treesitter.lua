@@ -45,6 +45,8 @@ return {
 				"c",
 				"php",
 				"python",
+				"http",
+				"vue",
 			},
 			incremental_selection = {
 				enable = true,

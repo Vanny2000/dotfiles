@@ -33,7 +33,7 @@ return {
 				keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
 				opts.desc = "Show LSP definitions"
-				keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+				keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>zz", opts) -- show lsp definitions
 
 				opts.desc = "Show LSP implementations"
 				keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
@@ -83,6 +83,20 @@ return {
 			function(server_name)
 				lspconfig[server_name].setup({
 					capabilities = capabilities,
+				})
+			end,
+			["volar"] = function()
+				lspconfig.volar.setup({
+					capabilities = capabilities,
+					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+					init_options = {
+						vue = {
+							hybridMode = false,
+						},
+						typescript = {
+							tsdk = "/Users/thuan/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
+						},
+					},
 				})
 			end,
 			["intelephense"] = function()
