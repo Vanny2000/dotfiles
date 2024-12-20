@@ -11,6 +11,11 @@ return {
 			-- install jsregexp (optional!).
 			build = "make install_jsregexp",
 		},
+		{
+			"mistweaverco/kulala-cmp-graphql.nvim", -- GraphQL source for nvim-cmp in http files
+			opts = {},
+			ft = "http",
+		},
 		"saadparwaiz1/cmp_luasnip", -- for autocompletion
 		"rafamadriz/friendly-snippets", -- useful snippets
 		"onsails/lspkind.nvim", -- vs-code like pictograms
@@ -62,6 +67,13 @@ return {
 					ellipsis_char = "...",
 				}),
 			},
+		})
+		cmp.setup.filetype("http", {
+			sources = cmp.config.sources({
+				{ name = "kulala-cmp-graphql" },
+			}, {
+				{ name = "buffer" },
+			}),
 		})
 	end,
 }

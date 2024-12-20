@@ -107,6 +107,13 @@ return {
 				end,
 				desc = "Set Environment",
 			},
+			{
+				"<leader>rs",
+				function()
+					kulala.download_graphql_schema()()
+				end,
+				desc = "Download Graphql Schema",
+			},
 		}
 		return keys
 	end,
