@@ -1,0 +1,9 @@
+[user]
+	name = Vanny
+	email = kongvanny2000@gmail.com
+[pull]
+	ff = only
+[http]
+	postBuffer = 157286400
+[core]
+	editor = nvim
