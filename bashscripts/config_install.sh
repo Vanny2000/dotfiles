@@ -1,15 +1,23 @@
 #!/bin/bash
+
+# Clone the bare dotfiles repository
 git clone --bare https://github.com/Vanny2000/dotfiles.git $HOME/dotfiles
+
+# Create a function to manage dotfiles with the correct Git command
 function dots {
-   /usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME $@
+   /usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME "$@"
 }
-mkdir -p .config-backup
-dots checkout
-if [ $? = 0 ]; then
-  echo "Checked out config.";
-  else
-    echo "Backing up pre-existing dot files.";
-    config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} .config-backup/{}
-fi;
-dots checkout
-dots config status.showUntrackedFiles no
+
+# Ensure an alias is set up for future sessions
+echo "alias dots='/usr/bin/git --git-dir=$HOME/dotfiles --work-tree=$HOME'" >> $HOME/.zshrc
+
+# Backup existing dotfiles that conflict
+mkdir -p $HOME/.config-backup
+dots checkout 2>&1 | grep -E "^\s+" | awk '{print $1}' | xargs -I{} mv {} $HOME/.config-backup/{}
+
+# Try checking out again
+dots checkout && echo "Checked out config." || echo "Failed to apply dotfiles."
+
+# Hide untracked files
+dots config --local status.showUntrackedFiles no
+
