@@ -48,8 +48,8 @@ return {
 				["<C-b>"] = cmp.mapping.scroll_docs(-4),
 				["<C-f>"] = cmp.mapping.scroll_docs(4),
 				["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
+				["<Tab>"] = cmp.mapping.confirm({ select = true }),
 				["<C-e>"] = cmp.mapping.abort(), -- close completion window
-				["<C-i>"] = cmp.mapping.confirm({ select = true }),
 			}),
 			-- sources for autocompletion
 			sources = cmp.config.sources({
@@ -71,6 +71,7 @@ return {
 		cmp.setup.filetype("http", {
 			sources = cmp.config.sources({
 				{ name = "kulala-cmp-graphql" },
+				{ name = "luasnip" }, -- snippets
 			}, {
 				{ name = "buffer" },
 			}),

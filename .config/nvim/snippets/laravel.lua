@@ -113,32 +113,3 @@ ls.add_snippets("php", {
 		t({ "", "});" }),
 	}),
 })
-
-ls.add_snippets("http", {
-	s("req", {
-		t("# @name "),
-		i(3, "request_name"),
-		t({ "", "" }),
-		c(1, {
-			t("GET"),
-			t("POST"),
-			t("PUT"),
-			t("PATCH"),
-			t("DELETE"),
-			t("HEAD"),
-			t("OPTIONS"),
-		}),
-		t(" "),
-		i(2, "{{API_URL}}/endpoint"),
-		t({ "", "Authentication: Bearer {{API_KEY}}" }),
-		t({ "", "" }),
-		i(0),
-		t({ "", "###" }),
-	}),
-})
-
--- set keybinds for both INSERT and VISUAL.
-vim.api.nvim_set_keymap("i", "<C-j>", "<Plug>luasnip-next-choice", {})
-vim.api.nvim_set_keymap("s", "<C-j>", "<Plug>luasnip-next-choice", {})
-vim.api.nvim_set_keymap("i", "<C-k>", "<Plug>luasnip-prev-choice", {})
-vim.api.nvim_set_keymap("s", "<C-k>", "<Plug>luasnip-prev-choice", {})
