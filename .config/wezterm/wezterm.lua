@@ -20,8 +20,8 @@ config.font = wezterm.font("MesloLGL Nerd Font")
 config.font_size = 16
 config.enable_tab_bar = false
 config.window_padding = {
-	left = 10,
-	right = 10,
+	left = 0,
+	right = 0,
 	top = 0,
 	bottom = 0,
 }
@@ -30,7 +30,7 @@ config.window_background_opacity = 0.75
 config.macos_window_background_blur = 10
 
 -- Toggle opacity function (your existing code)
-wezterm.on("toggle-opacity", function(window, pane)
+wezterm.on("toggle-opacity", function(window)
 	local overrides = window:get_config_overrides() or {}
 	if not overrides.window_background_opacity then
 		overrides.window_background_opacity = 1.0
