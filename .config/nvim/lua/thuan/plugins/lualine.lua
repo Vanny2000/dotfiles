@@ -34,6 +34,14 @@ return {
 				c = { fg = colors.white },
 			},
 		}
+		local function get_tmux_window()
+			local handle = io.popen("tmux display-message -p '#W'")
+			---@diagnostic disable-next-line: need-check-nil
+			local result = handle:read("*a")
+			---@diagnostic disable-next-line: need-check-nil
+			handle:close()
+			return result:gsub("\n", "") -- Remove any trailing newline
+		end
 
 		require("lualine").setup({
 			options = {
@@ -45,7 +53,7 @@ return {
 				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
 				lualine_b = { "filename", "branch" },
 				lualine_c = {
-					"%=", --[[ add your center compoentnts here in place of this comment ]]
+					{ get_tmux_window, icon = "" }, -- Add the tmux window component
 				},
 				lualine_x = {},
 				lualine_y = { "filetype", "progress" },
