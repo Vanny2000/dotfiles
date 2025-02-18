@@ -55,8 +55,17 @@ return {
 				lualine_c = {
 					{ get_tmux_window, icon = "" }, -- Add the tmux window component
 				},
-				lualine_x = {},
-				lualine_y = { "filetype", "progress" },
+				lualine_x = {
+					{
+						require("noice").api.statusline.mode.get,
+						cond = require("noice").api.statusline.mode.has,
+						color = { fg = "#ff9e64" },
+					},
+				},
+				lualine_y = {
+					"filetype",
+					"progress",
+				},
 				lualine_z = {
 					{ "location", separator = { right = "" }, left_padding = 2 },
 				},
