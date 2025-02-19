@@ -29,7 +29,7 @@ config.window_padding = {
 	bottom = 0,
 }
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.75
+config.window_background_opacity = 0.60
 config.macos_window_background_blur = 10
 
 -- Toggle opacity function (your existing code)

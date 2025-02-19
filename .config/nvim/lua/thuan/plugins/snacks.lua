@@ -10,7 +10,6 @@ return {
 		picker = {},
 		explorer = {},
 		notifier = {},
-		dim = {},
 		dashboard = {
 			preset = {
 				keys = {
@@ -33,7 +32,9 @@ return {
         ]],
 			},
 			sections = {
-				{ section = "header" },
+				{
+					section = "header",
+				},
 				{ section = "keys", gap = 1, padding = 1 },
 				{ section = "startup" },
 			},
@@ -92,21 +93,6 @@ return {
 				Snacks.notifier.hide()
 			end,
 			desc = "Dismiss notification",
-		},
-		-- Dim screen
-		{
-			"<leader>ds",
-			function()
-				Snacks.dim.enable()
-			end,
-			desc = "Dim screen",
-		},
-		{
-			"<leader>dd",
-			function()
-				Snacks.dim.disable()
-			end,
-			desc = "Disable Dim screen",
 		},
 	},
 }
