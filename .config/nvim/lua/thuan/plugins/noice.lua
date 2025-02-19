@@ -76,11 +76,6 @@ return {
 			},
 		},
 	},
-	keys = {
-		{ "<leader>nn", "<cmd>Noice<CR>", desc = "[n]oice [n]otifications" },
-		{ "<leader>nd", "<cmd>Noice dismiss<CR>", desc = "[noice] [d]ismiss" },
-		{ "<leader>ne", "<cmd>Noice errors<CR>", desc = "[noice] [e]rrors" },
-	},
 	dependencies = {
 		-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
 		"MunifTanjim/nui.nvim",
