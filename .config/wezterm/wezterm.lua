@@ -16,14 +16,17 @@ config.colors = {
 	brights = { "#214969", "#E52E2E", "#44FFB1", "#FFE073", "#A277FF", "#a277ff", "#24EAF7", "#24EAF7" },
 }
 
+-- bumping up the refresh rate go brrrrr
+config.max_fps = 120
+
 config.font = wezterm.font("MesloLGL Nerd Font")
 config.font_size = 16
 config.enable_tab_bar = false
 config.window_padding = {
 	left = 0,
 	right = 0,
-	top = 0,
-	bottom = 0,
+	top = 5,
+	bottom = 5,
 }
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.75
