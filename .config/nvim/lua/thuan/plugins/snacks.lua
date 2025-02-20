@@ -67,6 +67,14 @@ return {
 			end,
 			desc = " Explore config files",
 		},
+		{
+			"<leader>en",
+			function()
+				local home = os.getenv("HOME")
+				Snacks.dashboard.pick("files", { cwd = home .. "/Obsidian/The Brain/notes/dailies" })
+			end,
+			desc = "Explore daily notes",
+		},
 		-- Searching
 		{
 			"<leader>ff",

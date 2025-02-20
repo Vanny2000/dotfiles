@@ -19,7 +19,7 @@ config.colors = {
 -- bumping up the refresh rate go brrrrr
 config.max_fps = 120
 
-config.font = wezterm.font("MesloLGL Nerd Font")
+config.font = wezterm.font("Hack Nerd Font")
 config.font_size = 16
 config.enable_tab_bar = false
 config.window_padding = {
@@ -29,8 +29,8 @@ config.window_padding = {
 	bottom = 0,
 }
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.60
-config.macos_window_background_blur = 10
+config.window_background_opacity = 0.6
+config.macos_window_background_blur = 5
 
 -- Toggle opacity function (your existing code)
 wezterm.on("toggle-opacity", function(window)
