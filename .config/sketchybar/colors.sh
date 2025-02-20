@@ -3,14 +3,15 @@
 export WHITE=0xffffffff
 
 # -- Teal Scheme --
-export BAR_COLOR=0xff001f30
-export ITEM_BG_COLOR=0xff003547
-export ACCENT_COLOR=0xff2cf9ed
+# export BAR_COLOR=0xff001f30
+# export ITEM_BG_COLOR=0xff003547
+# export ACCENT_COLOR=0xff2cf9ed
 
 # -- Gray Scheme --
-# export BAR_COLOR=0xff101314
+export BAR_COLOR=0xff101314
 # export ITEM_BG_COLOR=0xff353c3f
-# export ACCENT_COLOR=0xffffffff
+export ITEM_BG_COLOR=0xff011423
+export ACCENT_COLOR=0xffffffff
 
 # -- Purple Scheme --
 # export BAR_COLOR=0xff140c42

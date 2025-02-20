@@ -7,19 +7,24 @@ return {
 		image = {},
 		indent = {},
 		lazygit = {},
-		picker = {},
+		picker = {
+			sources = {
+				explorer = {
+					auto_close = true,
+				},
+			},
+		},
 		explorer = {},
 		notifier = {},
 		dashboard = {
 			preset = {
 				keys = {
 					{
-						icon = " ",
-						key = "c",
-						desc = "Config",
-						action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})",
+						icon = " ",
+						key = "r",
+						desc = "Recent Files",
+						action = ":lua Snacks.dashboard.pick('oldfiles')",
 					},
-					{ icon = " ", key = "s", desc = "Restore Session", section = "session" },
 					{ icon = " ", key = "q", desc = "Quit", action = ":qa" },
 				},
 				header = [[
@@ -32,9 +37,7 @@ return {
         ]],
 			},
 			sections = {
-				{
-					section = "header",
-				},
+				{ section = "header" },
 				{ section = "keys", gap = 1, padding = 1 },
 				{ section = "startup" },
 			},
@@ -55,7 +58,14 @@ return {
 			function()
 				Snacks.explorer()
 			end,
-			desc = "Toggle file explorer",
+			desc = " Toggle file explorer",
+		},
+		{
+			"<leader>ec",
+			function()
+				Snacks.dashboard.pick("files", { cwd = vim.fn.stdpath("config") })
+			end,
+			desc = " Explore config files",
 		},
 		-- Searching
 		{
@@ -78,6 +88,21 @@ return {
 				Snacks.picker.grep()
 			end,
 			desc = "Fuzzy find word in cwd",
+		},
+		-- Diagnostics
+		{
+			"<leader>fds",
+			function()
+				Snacks.picker.diagnostics()
+			end,
+			desc = "[f]ind [d]iagnostic[s]",
+		},
+		{
+			"<leader>fdc",
+			function()
+				Snacks.picker.diagnostics_buffer()
+			end,
+			desc = "[f]ind [d]iagnostic[s] in [c]urrent buffer",
 		},
 		-- Notifier
 		{
