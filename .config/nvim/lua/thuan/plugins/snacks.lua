@@ -5,6 +5,7 @@ return {
 	---@type snacks.Config
 	opts = {
 		image = {},
+		input = {},
 		indent = {},
 		lazygit = {},
 		picker = {
@@ -41,6 +42,10 @@ return {
 				{ section = "keys", gap = 1, padding = 1 },
 				{ section = "startup" },
 			},
+		},
+		scroll = {
+			duration = { step = 15, total = 200 },
+			easing = "linear",
 		},
 	},
 	keys = {
