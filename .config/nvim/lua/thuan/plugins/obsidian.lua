@@ -63,10 +63,4 @@ return {
 
 		-- see below for full list of options 👇
 	},
-	vim.keymap.set("n", "<leader>od", "<cmd>ObsidianDailies<CR>", { desc = "Open/Create daily notes" }),
-	vim.keymap.set("n", "<leader>ot", "<cmd>ObsidianNewFromTemplate<CR>", { desc = "Create new note from template" }),
-	vim.keymap.set("v", "<leader>oe", "<cmd>ObsidianExtractNote<CR>", { desc = "Extact note" }),
-	vim.keymap.set("n", "<leader>ow", "<cmd>ObsidianWorkspace<CR>", { desc = "Switch Workspaces" }),
-	vim.keymap.set("n", "<leader>op", "<cmd>ObsidianPasteImg<CR>", { desc = "Paste image" }),
-	vim.keymap.set("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "New note" }),
 }

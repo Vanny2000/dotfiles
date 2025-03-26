@@ -43,11 +43,27 @@ wezterm.on("toggle-opacity", function(window)
 	window:set_config_overrides(overrides)
 end)
 
+-- Toggle font size between current one and bigger size
+wezterm.on("toggle-font-size", function(window)
+	local overrides = window:get_config_overrides() or {}
+	if not overrides.font_size then
+		overrides.font_size = 24
+	else
+		overrides.font_size = nil
+	end
+	window:set_config_overrides(overrides)
+end)
+
 config.keys = {
 	{
 		key = "O",
 		mods = "CTRL|SHIFT",
 		action = wezterm.action.EmitEvent("toggle-opacity"),
+	},
+	{
+		key = "+",
+		mods = "CTRL|SHIFT",
+		action = wezterm.action.EmitEvent("toggle-font-size"),
 	},
 }
 

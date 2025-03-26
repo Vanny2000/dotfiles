@@ -112,4 +112,13 @@ ls.add_snippets("php", {
 		i(0, "// Routes go here"),
 		t({ "", "});" }),
 	}),
+	-- Route::get with closure
+	s("rget", {
+		t("Route::get('"),
+		i(1, "/test"),
+		t("', function () {"),
+		t({ "", "    " }),
+		i(0),
+		t({ "", "});" }),
+	}),
 })

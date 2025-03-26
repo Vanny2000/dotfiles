@@ -51,7 +51,7 @@ return {
 			},
 			sections = {
 				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
-				lualine_b = { "filename", "branch" },
+				lualine_b = { "filename" },
 				lualine_c = {
 					{ get_tmux_window, icon = "" }, -- Add the tmux window component
 				},
@@ -59,7 +59,7 @@ return {
 					{
 						require("noice").api.statusline.mode.get,
 						cond = require("noice").api.statusline.mode.has,
-						color = { fg = "#ff9e64" },
+						color = { fg = "#44FFB1" },
 					},
 				},
 				lualine_y = {

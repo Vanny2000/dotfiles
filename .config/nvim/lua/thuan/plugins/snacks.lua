@@ -4,10 +4,11 @@ return {
 	lazy = false,
 	---@type snacks.Config
 	opts = {
-		image = {},
+		image = { enable = true },
 		input = {},
 		indent = {},
 		lazygit = {},
+		dim = {},
 		picker = {
 			sources = {
 				explorer = {
@@ -131,6 +132,21 @@ return {
 				Snacks.notifier.hide()
 			end,
 			desc = "Dismiss notification",
+		},
+		-- Dim screen
+		{
+			"<leader>ds",
+			function()
+				Snacks.dim.enable()
+			end,
+			desc = "Dim screen",
+		},
+		{
+			"<leader>dq",
+			function()
+				Snacks.dim.disable()
+			end,
+			desc = "Dim quit",
 		},
 	},
 }

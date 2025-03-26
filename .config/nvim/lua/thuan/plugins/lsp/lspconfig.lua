@@ -97,6 +97,11 @@ return {
 							tsdk = "/Users/thuan/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
 						},
 					},
+					on_attach = function(client, bufnr)
+						if client.name == "volar" then
+							client.server_capabilities.documentFormattingProvider = false
+						end
+					end,
 				})
 			end,
 			["intelephense"] = function()
