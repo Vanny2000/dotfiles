@@ -4,7 +4,13 @@ return {
 	lazy = false,
 	---@type snacks.Config
 	opts = {
-		image = { enable = true },
+		image = {
+			enable = true,
+			doc = {
+				enable = true,
+				inline = false,
+			},
+		},
 		input = {},
 		indent = {},
 		lazygit = {},
@@ -80,6 +86,13 @@ return {
 				Snacks.dashboard.pick("files", { cwd = home .. "/Obsidian/The Brain/notes/dailies" })
 			end,
 			desc = "Explore daily notes",
+		},
+		{
+			"<leader>bg",
+			function()
+				Snacks.picker.colorschemes()
+			end,
+			desc = "Explore colorschemes",
 		},
 		-- Searching
 		{

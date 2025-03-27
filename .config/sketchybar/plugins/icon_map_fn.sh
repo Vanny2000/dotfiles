@@ -14,6 +14,9 @@ function icon_map() {
   "Alacritty" | "Hyper" | "iTerm2" | "kitty" | "Terminal" | "终端" | "WezTerm")
     icon_result=":terminal:"
     ;;
+  "Ghostty")
+    icon_result=":ghostty:"
+    ;;
   "Microsoft To Do" | "Things")
     icon_result=":things:"
     ;;
