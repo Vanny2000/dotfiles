@@ -115,6 +115,7 @@ source $ZSH/oh-my-zsh.sh
  alias srb="~/bashscripts/shoprunback-setup.sh"
  alias n="nvim"
  alias dots='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
+ alias man="tldr"
  # ---- Eza (better ls) -----
 
  alias ls="eza --icons=auto"

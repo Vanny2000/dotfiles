@@ -3,7 +3,6 @@ vim.g.mapleader = " "
 
 local keymap = vim.keymap -- for conciseness
 
-keymap.set("n", "<leader><leader>x", "<cmd>source %<CR>", { desc = "Source file" })
 keymap.set("n", "<leader>x", ":.lua<CR>", { desc = "Run this line" })
 keymap.set("v", "<leader>x", ":lua<CR>", { desc = "Run selections" })
 ---------------------

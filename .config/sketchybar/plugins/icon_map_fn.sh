@@ -17,6 +17,9 @@ function icon_map() {
   "Ghostty")
     icon_result=":ghostty:"
     ;;
+  "Zen")
+    icon_result=":zen_browser:"
+    ;;
   "Microsoft To Do" | "Things")
     icon_result=":things:"
     ;;

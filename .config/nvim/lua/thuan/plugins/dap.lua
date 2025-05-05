@@ -178,10 +178,8 @@ return {
 		-- Basic controls
 		keymap.set("n", debug_prefix .. "n", "<cmd>DapNew<CR>", { desc = "Launch new debug session", unpack(opts) })
 		keymap.set("n", debug_prefix .. "c", dap.continue, { desc = "Continue", unpack(opts) })
-		keymap.set("n", debug_prefix .. "x", dap.terminate, { desc = "Terminate", unpack(opts) })
-
 		-- Stepping
-		keymap.set("n", debug_prefix .. "o", dap.step_over, { desc = "Step Over", unpack(opts) })
+		keymap.set("n", "<leader><leader>", dap.step_over, { desc = "Step Over", unpack(opts) })
 		keymap.set("n", debug_prefix .. "i", dap.step_into, { desc = "Step Into", unpack(opts) })
 		keymap.set("n", debug_prefix .. "O", dap.step_out, { desc = "Step Out", unpack(opts) })
 
@@ -200,5 +198,13 @@ return {
 			dapui.close()
 			dap.terminate()
 		end, { desc = "Reset Debug Session", unpack(opts) })
+
+		-- Restart session without clearing breakpoints
+		keymap.set(
+			"n",
+			debug_prefix .. "x",
+			dap.restart,
+			{ desc = "Reset Debug Session w/o clearing breakpoints", unpack(opts) }
+		)
 	end,
 }

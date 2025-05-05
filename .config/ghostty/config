@@ -13,7 +13,7 @@ auto-update = check
 
 # theme related config
 theme = tokyonight
-background-opacity = 0.55
+background-opacity = 0.4
 background-blur-radius = 5
 # Base colors
 foreground=#CBE0F0
