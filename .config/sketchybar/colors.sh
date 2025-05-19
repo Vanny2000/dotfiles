@@ -9,7 +9,6 @@ export WHITE=0xffffffff
 
 # -- Gray Scheme --
 # export BAR_COLOR=0xff101314
-# export ITEM_BG_COLOR=0xff353c3f
 # export ITEM_BG_COLOR=0xff011423
 # export ACCENT_COLOR=0xffffffff
 
@@ -43,3 +42,19 @@ export ACCENT_COLOR=0xffeb46f9
 # export BAR_COLOR=0xff2d2b02
 # export ITEM_BG_COLOR=0xff8e7e0a
 # export ACCENT_COLOR=0xfff7fc17
+
+# -- Tokyo Night Scheme --
+# export BAR_COLOR=0xff1a1b26
+# export ITEM_BG_COLOR=0xff24283b
+# export ACCENT_COLOR=0xff7aa2f7
+
+# -- Tokyo Night Storm Scheme --
+# export BAR_COLOR=0xff24283b
+# export ITEM_BG_COLOR=0xff343b58
+# export ACCENT_COLOR=0xff7dcfff
+
+# -- Tokyo Night Light Scheme --
+# export BAR_COLOR=0xffd5d6db
+# export ITEM_BG_COLOR=0xffcbccd1
+# export ACCENT_COLOR=0xff34548a
+
