@@ -189,5 +189,9 @@ bindkey '^[[B' history-search-forward
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+# setting up env secrets
+[ -f ~/.zsh_secrets ] && source ~/.zsh_secrets
+
 alias dots='/usr/bin/git --git-dir=/Users/thuan/dotfiles/ --work-tree=/Users/thuan'
 eval "$(starship init zsh)"
+

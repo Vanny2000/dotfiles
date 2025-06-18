@@ -7,3 +7,5 @@
 	postBuffer = 157286400
 [core]
 	editor = nvim
+[safe]
+	directory = /Users/thuan

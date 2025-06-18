@@ -50,3 +50,5 @@ opt.virtualedit = "block"
 -- turn off swapfile
 opt.swapfile = false
 opt.conceallevel = 1
+
+-- opt.showmode = false
