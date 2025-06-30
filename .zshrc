@@ -116,6 +116,7 @@ source $ZSH/oh-my-zsh.sh
  alias n="nvim"
  alias dots='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
  alias man="tldr"
+ alias telegram="TERM=xterm-256color nchat"
  # ---- Eza (better ls) -----
 
  alias ls="eza --icons=auto"
@@ -195,3 +196,6 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 alias dots='/usr/bin/git --git-dir=/Users/thuan/dotfiles/ --work-tree=/Users/thuan'
 eval "$(starship init zsh)"
 
+
+# Created by `pipx` on 2025-06-27 09:10:24
+export PATH="$PATH:/Users/thuan/.local/bin"

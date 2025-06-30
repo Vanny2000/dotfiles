@@ -2,38 +2,43 @@ return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
-    -- Bubbles config for lualine
-    -- Author: lokesh-krishna
-    -- MIT license, see LICENSE for more details.
-
-    -- stylua: ignore
-    local colors = {
-      blue   = '#80a0ff',
-      cyan   = '#79dac8',
-      black  = '#080808',
-      white  = '#c6c6c6',
-      red    = '#ff5189',
-      violet = '#d183e8',
-      grey   = '#303030',
-    }
+		-- Gruvbox Dark Hard colors
+		local colors = {
+			bg0_hard = "#1d2021",
+			bg0 = "#282828",
+			bg1 = "#3c3836",
+			bg2 = "#504945",
+			fg0 = "#fbf1c7",
+			fg1 = "#ebdbb2",
+			red = "#fb4934",
+			green = "#b8bb26",
+			yellow = "#fabd2f",
+			blue = "#83a598",
+			purple = "#d3869b",
+			aqua = "#8ec07c",
+			orange = "#fe8019",
+			gray = "#928374",
+		}
 
 		local bubbles_theme = {
 			normal = {
-				a = { fg = colors.black, bg = colors.violet },
-				b = { fg = colors.white, bg = colors.grey },
-				c = { fg = colors.white },
+				a = { fg = colors.bg0_hard, bg = colors.blue, gui = "bold" },
+				b = { fg = colors.fg1, bg = colors.bg2 },
+				c = { fg = colors.fg1, bg = colors.bg0_hard },
 			},
 
-			insert = { a = { fg = colors.black, bg = colors.blue } },
-			visual = { a = { fg = colors.black, bg = colors.cyan } },
-			replace = { a = { fg = colors.black, bg = colors.red } },
+			insert = { a = { fg = colors.bg0_hard, bg = colors.green, gui = "bold" } },
+			visual = { a = { fg = colors.bg0_hard, bg = colors.orange, gui = "bold" } },
+			replace = { a = { fg = colors.bg0_hard, bg = colors.red, gui = "bold" } },
+			command = { a = { fg = colors.bg0_hard, bg = colors.yellow, gui = "bold" } },
 
 			inactive = {
-				a = { fg = colors.white, bg = colors.black },
-				b = { fg = colors.white, bg = colors.black },
-				c = { fg = colors.white },
+				a = { fg = colors.gray, bg = colors.bg1 },
+				b = { fg = colors.gray, bg = colors.bg1 },
+				c = { fg = colors.gray, bg = colors.bg0_hard },
 			},
 		}
+
 		local function get_tmux_window()
 			local handle = io.popen("tmux display-message -p '#W'")
 			---@diagnostic disable-next-line: need-check-nil
@@ -45,21 +50,26 @@ return {
 
 		require("lualine").setup({
 			options = {
-				theme = bubbles_theme,
-				component_separators = "",
+				theme = "everforest",
+				-- component_separators = "",
+				-- section_separators = { left = "", right = "" },
 				section_separators = { left = "", right = "" },
+				component_separators = { left = "", right = "" },
 			},
 			sections = {
 				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
 				lualine_b = { "filename" },
 				lualine_c = {
-					{ get_tmux_window, icon = "" }, -- Add the tmux window component
+					{ get_tmux_window, icon = "" }, -- Add the tmux window component
 				},
 				lualine_x = {
 					{
+
 						require("noice").api.statusline.mode.get,
+
 						cond = require("noice").api.statusline.mode.has,
-						color = { fg = "#44FFB1" },
+
+						color = { fg = "#ff9e64" },
 					},
 				},
 				lualine_y = {
@@ -67,7 +77,12 @@ return {
 					"progress",
 				},
 				lualine_z = {
-					{ "location", separator = { right = "" }, left_padding = 2 },
+					{
+						function()
+							return " " .. os.date("%R")
+						end,
+						separator = { right = "" },
+					},
 				},
 			},
 			inactive_sections = {

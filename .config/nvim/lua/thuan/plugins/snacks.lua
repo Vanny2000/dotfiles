@@ -4,13 +4,16 @@ return {
 	lazy = false,
 	---@type snacks.Config
 	opts = {
-		image = {
+		bigfile = {
 			enable = true,
-			doc = {
-				enable = true,
-				inline = false,
-			},
 		},
+		-- image = {
+		-- 	enable = false,
+		-- 	doc = {
+		-- 		enable = true,
+		-- 		inline = false,
+		-- 	},
+		-- },
 		input = {},
 		indent = {},
 		lazygit = {},

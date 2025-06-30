@@ -5,15 +5,11 @@ return {
 		"hrsh7th/cmp-nvim-lsp",
 		{ "antosha417/nvim-lsp-file-operations", config = true },
 		{ "folke/neodev.nvim", opts = {} },
+		"williamboman/mason.nvim",
+		"williamboman/mason-lspconfig.nvim",
 	},
 	config = function()
-		-- import lspconfig plugin
-		local lspconfig = require("lspconfig")
-
-		-- import mason_lspconfig plugin
-		local mason_lspconfig = require("mason-lspconfig")
-
-		-- import cmp-nvim-lsp plugin
+		-- import cmp-nvim-lsp plugin for capabilities
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
 		local keymap = vim.keymap -- for conciseness
@@ -53,11 +49,11 @@ return {
 				opts.desc = "Show line diagnostics"
 				keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
 
-				opts.desc = "Go to previous diagnostic"
-				keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
-
-				opts.desc = "Go to next diagnostic"
-				keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+				-- opts.desc = "Go to previous diagnostic"
+				-- keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+				--
+				-- opts.desc = "Go to next diagnostic"
+				-- keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
 				opts.desc = "Show documentation for what is under cursor"
 				keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
@@ -71,125 +67,114 @@ return {
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
 		-- Change the Diagnostic symbols in the sign column (gutter)
-		-- (not in youtube nvim video)
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-		for type, icon in pairs(signs) do
-			local hl = "DiagnosticSign" .. type
-			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-		end
+		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+		vim.diagnostic.config({
+			signs = {
+				text = signs,
+			},
+		})
 
-		mason_lspconfig.setup_handlers({
-			-- default handler for installed servers
-			function(server_name)
-				lspconfig[server_name].setup({
-					capabilities = capabilities,
-				})
+		-- Enable LSP servers using vim.lsp.enable (Neovim 0.11+)
+		vim.lsp.enable("lua_ls")
+		vim.lsp.enable("vue_ls")
+		vim.lsp.enable("intelephense")
+		vim.lsp.enable("svelte")
+		vim.lsp.enable("graphql")
+		vim.lsp.enable("emmet_ls")
+		vim.lsp.enable("cssls")
+
+		-- Configure individual servers using vim.lsp.config
+		vim.lsp.config("vue_ls", {
+			capabilities = capabilities,
+			filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+			init_options = {
+				vue = {
+					hybridMode = false,
+				},
+				typescript = {
+					tsdk = "/Users/thuan/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
+				},
+			},
+			on_attach = function(client, _)
+				if client.name == "vue_ls" then
+					client.server_capabilities.documentFormattingProvider = false
+				end
 			end,
-			["volar"] = function()
-				lspconfig.volar.setup({
-					capabilities = capabilities,
-					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-					init_options = {
-						vue = {
-							hybridMode = false,
-						},
-						typescript = {
-							tsdk = "/Users/thuan/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
-						},
+		})
+
+		vim.lsp.config("intelephense", {
+			capabilities = capabilities,
+			settings = {
+				intelephense = {
+					format = {
+						enable = true, -- Enable formatting
 					},
-					on_attach = function(client, bufnr)
-						if client.name == "volar" then
-							client.server_capabilities.documentFormattingProvider = false
-						end
+					files = {
+						maxSize = 5000000, -- Increase the file size limit if necessary
+					},
+					diagnostics = {
+						enable = true,
+					},
+				},
+			},
+		})
+
+		vim.lsp.config("svelte", {
+			capabilities = capabilities,
+			on_attach = function(client, _)
+				vim.api.nvim_create_autocmd("BufWritePost", {
+					pattern = { "*.js", "*.ts" },
+					callback = function(ctx)
+						-- Here use ctx.match instead of ctx.file
+						client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
 					end,
 				})
 			end,
-			["intelephense"] = function()
-				lspconfig.intelephense.setup({
-					capabilities = capabilities,
-					settings = {
-						intelephense = {
-							format = {
-								enable = true, -- Enable formatting
-							},
-							files = {
-								maxSize = 5000000, -- Increase the file size limit if necessary
-							},
-							diagnostics = {
-								enable = true,
-							},
-						},
+		})
+
+		vim.lsp.config("graphql", {
+			capabilities = capabilities,
+			filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+		})
+
+		vim.lsp.config("emmet_ls", {
+			capabilities = capabilities,
+			filetypes = {
+				"html",
+				"typescriptreact",
+				"javascriptreact",
+				"css",
+				"sass",
+				"scss",
+				"less",
+				"svelte",
+			},
+		})
+
+		vim.lsp.config("cssls", {
+			capabilities = capabilities,
+			settings = {
+				css = {
+					lint = {
+						unknownAtRules = "ignore",
 					},
-				})
-			end,
-			["svelte"] = function()
-				-- configure svelte server
-				lspconfig["svelte"].setup({
-					capabilities = capabilities,
-					---@diagnostic disable-next-line: unused-local
-					on_attach = function(client, bufnr)
-						vim.api.nvim_create_autocmd("BufWritePost", {
-							pattern = { "*.js", "*.ts" },
-							callback = function(ctx)
-								-- Here use ctx.match instead of ctx.file
-								client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-							end,
-						})
-					end,
-				})
-			end,
-			["graphql"] = function()
-				-- configure graphql language server
-				lspconfig["graphql"].setup({
-					capabilities = capabilities,
-					filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-				})
-			end,
-			["emmet_ls"] = function()
-				-- configure emmet language server
-				lspconfig["emmet_ls"].setup({
-					capabilities = capabilities,
-					filetypes = {
-						"html",
-						"typescriptreact",
-						"javascriptreact",
-						"css",
-						"sass",
-						"scss",
-						"less",
-						"svelte",
+				},
+			},
+		})
+
+		vim.lsp.config("lua_ls", {
+			capabilities = capabilities,
+			settings = {
+				Lua = {
+					-- make the language server recognize "vim" global
+					diagnostics = {
+						globals = { "vim" },
 					},
-				})
-			end,
-			["cssls"] = function()
-				lspconfig["cssls"].setup({
-					capabilities = capabilities,
-					settings = {
-						css = {
-							lint = {
-								unknownAtRules = "ignore",
-							},
-						},
+					completion = {
+						callSnippet = "Replace",
 					},
-				})
-			end,
-			["lua_ls"] = function()
-				-- configure lua server (with special settings)
-				lspconfig["lua_ls"].setup({
-					capabilities = capabilities,
-					settings = {
-						Lua = {
-							-- make the language server recognize "vim" global
-							diagnostics = {
-								globals = { "vim" },
-							},
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
-					},
-				})
-			end,
+				},
+			},
 		})
 	end,
 }
