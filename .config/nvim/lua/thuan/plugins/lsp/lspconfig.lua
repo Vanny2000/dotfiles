@@ -66,23 +66,6 @@ return {
 		-- used to enable autocompletion (assign to every lsp server config)
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
-		-- Change the Diagnostic symbols in the sign column (gutter)
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-		vim.diagnostic.config({
-			signs = {
-				text = signs,
-			},
-		})
-
-		-- Enable LSP servers using vim.lsp.enable (Neovim 0.11+)
-		vim.lsp.enable("lua_ls")
-		vim.lsp.enable("vue_ls")
-		vim.lsp.enable("intelephense")
-		vim.lsp.enable("svelte")
-		vim.lsp.enable("graphql")
-		vim.lsp.enable("emmet_ls")
-		vim.lsp.enable("cssls")
-
 		-- Configure individual servers using vim.lsp.config
 		vim.lsp.config("vue_ls", {
 			capabilities = capabilities,
@@ -176,5 +159,35 @@ return {
 				},
 			},
 		})
+		vim.diagnostic.config({
+			-- Change the Diagnostic symbols in the sign column (gutter)
+			signs = {
+				active = true,
+				text = {
+					-- [vim.diagnostic.severity.ERROR] = "",
+					[vim.diagnostic.severity.ERROR] = "",
+					[vim.diagnostic.severity.WARN] = "",
+					[vim.diagnostic.severity.HINT] = "󰟃",
+					[vim.diagnostic.severity.INFO] = "",
+				},
+			},
+			-- Use the default configuration
+			-- virtual_lines = true
+
+			-- Alternatively, customize specific options
+			virtual_lines = {
+				-- Only show virtual line diagnostics for the current cursor line
+				current_line = true,
+			},
+		})
+
+		-- Enable LSP servers using vim.lsp.enable (Neovim 0.11+)
+		vim.lsp.enable("lua_ls")
+		vim.lsp.enable("vue_ls")
+		vim.lsp.enable("intelephense")
+		vim.lsp.enable("svelte")
+		vim.lsp.enable("graphql")
+		vim.lsp.enable("emmet_ls")
+		vim.lsp.enable("cssls")
 	end,
 }
