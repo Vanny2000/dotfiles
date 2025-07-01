@@ -21,7 +21,7 @@ return {
 		smear_insert_mode = true,
 		-- Smear cursor color. Defaults to Cursor GUI color if not set.
 		-- Set to "none" to match the text color at the target cursor position.
-		-- cursor_color = "#CBE0F0",
+		-- cursor_color = "#fe8019",
 		stiffness = 0.6,
 		trailing_stiffness = 0.3,
 		distance_stop_animating = 0.5,

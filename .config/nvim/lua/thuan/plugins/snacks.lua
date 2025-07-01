@@ -7,13 +7,13 @@ return {
 		bigfile = {
 			enable = true,
 		},
-		-- image = {
-		-- 	enable = false,
-		-- 	doc = {
-		-- 		enable = true,
-		-- 		inline = false,
-		-- 	},
-		-- },
+		image = {
+			enable = false,
+			doc = {
+				enable = true,
+				inline = false,
+			},
+		},
 		input = {},
 		indent = {},
 		lazygit = {},

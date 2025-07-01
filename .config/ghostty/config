@@ -13,8 +13,8 @@ auto-update = check
 
 # theme related config
 theme = GruvboxDarkHard
-background-opacity = 0.4
-background-blur-radius = 5
+background-opacity = 0.7
+background-blur-radius = 4
 # Base colors
 foreground=#ebdbb2
 background=#282828
@@ -46,3 +46,4 @@ palette=12=#83a598
 palette=13=#d3869b
 palette=14=#8ec07c
 palette=15=#ebdbb2
+
