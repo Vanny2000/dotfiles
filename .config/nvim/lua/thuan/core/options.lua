@@ -1,9 +1,9 @@
 vim.cmd("let g:netrw_liststyle = 3")
-vim.filetype.add({
-	extension = {
-		["http"] = "http",
-	},
-})
+-- vim.filetype.add({
+-- 	extension = {
+-- 		["http"] = "http",
+-- 	},
+-- })
 
 local opt = vim.opt -- for conciseness
 

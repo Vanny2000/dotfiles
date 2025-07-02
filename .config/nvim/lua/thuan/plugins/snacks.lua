@@ -134,9 +134,9 @@ return {
 			desc = "[f]ind [d]iagnostic[s]",
 		},
 		{
-			"<leader>fdc",
+			"<leader>ft",
 			function()
-				Snacks.picker.diagnostics_buffer()
+				Snacks.picker.todo_comments()
 			end,
 			desc = "[f]ind [d]iagnostic[s] in [c]urrent buffer",
 		},
