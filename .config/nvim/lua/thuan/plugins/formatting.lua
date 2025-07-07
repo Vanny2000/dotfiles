@@ -20,7 +20,8 @@ return {
 				liquid = { "prettier" },
 				lua = { "stylua" },
 				python = { "isort", "black" },
-				php = { "php-cs-fixer" }, -- Add php-cs-fixer for PHP and Laravel
+				-- php = { "php_cs_fixer" }, -- Add php-cs-fixer for PHP and Laravel
+				blade = { "blade-formatter" }, -- Add blade-formatter blade files
 				go = { "gofmt" },
 			},
 			format_on_save = {
