@@ -82,9 +82,9 @@ return {
 				return string.format("![%s](%s)", path.name, path)
 			end,
 		},
-		-- ui = {
-		-- 	enable = false,
-		-- },
+		ui = {
+			enable = false,
+		},
 
 		-- see below for full list of options 👇
 	},

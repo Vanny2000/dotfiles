@@ -8,7 +8,7 @@ return {
 			enable = true,
 		},
 		image = {
-			enable = false,
+			enable = true,
 			doc = {
 				enable = true,
 				inline = false,
