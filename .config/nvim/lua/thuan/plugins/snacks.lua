@@ -17,7 +17,7 @@ return {
 		input = {},
 		indent = {},
 		lazygit = {},
-		dim = {},
+		-- dim = {},
 		picker = {
 			-- hidden = true,
 			-- ignored = true,
