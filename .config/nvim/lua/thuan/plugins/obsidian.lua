@@ -20,7 +20,6 @@ return {
 		"nvim-lua/plenary.nvim",
 		-- Optional
 		"hrsh7th/nvim-cmp",
-		"nvim-telescope/telescope.nvim",
 		"nvim-treesitter",
 
 		-- see below for full list of optional dependencies 👇
