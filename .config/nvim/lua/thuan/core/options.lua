@@ -49,6 +49,6 @@ opt.splitbelow = true -- split horizontal window to the bottom
 opt.virtualedit = "block"
 -- turn off swapfile
 opt.swapfile = false
-opt.conceallevel = 1
+opt.conceallevel = 3
 
 -- opt.showmode = false
