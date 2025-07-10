@@ -2,6 +2,7 @@ return {
 	"folke/snacks.nvim",
 	priority = 1000,
 	lazy = false,
+	---@diagnostic disable-next-line: undefined-doc-name
 	---@type snacks.Config
 	opts = {
 		bigfile = {
@@ -14,11 +15,18 @@ return {
 				inline = false,
 			},
 		},
-		input = {},
-		indent = {},
-		lazygit = {},
+		input = {
+			enable = true,
+		},
+		indent = {
+			enable = true,
+		},
+		lazygit = {
+			enable = true,
+		},
 		-- dim = {},
 		picker = {
+			enable = true,
 			-- hidden = true,
 			-- ignored = true,
 			sources = {
@@ -31,9 +39,14 @@ return {
 				},
 			},
 		},
-		explorer = {},
-		notifier = {},
+		explorer = {
+			enable = true,
+		},
+		notifier = {
+			enable = true,
+		},
 		dashboard = {
+			enable = true,
 			preset = {
 				keys = {
 					{
@@ -60,6 +73,7 @@ return {
 			},
 		},
 		scroll = {
+			enable = true,
 			duration = { step = 15, total = 200 },
 			easing = "linear",
 		},
