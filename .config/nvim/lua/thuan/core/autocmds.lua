@@ -10,14 +10,3 @@ create_autocmd("TextYankPost", {
 		vim.highlight.on_yank()
 	end,
 })
-
--- Disable relative line numbers in Copilot buffers
-create_autocmd("BufEnter", {
-	pattern = "copilot-*",
-	callback = function()
-		-- Set buffer-local options
-		vim.opt_local.relativenumber = false
-		vim.opt_local.number = false
-		vim.opt_local.conceallevel = 0
-	end,
-})
