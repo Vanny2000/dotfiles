@@ -11,10 +11,11 @@ confirm-close-surface = false
 
 auto-update = check
 
+
 # theme related config
 theme = GruvboxDarkHard
 background-opacity = 0.7
-background-blur-radius = 4
+background-blur-radius = 7
 # Base colors
 foreground=#ebdbb2
 background=#282828
