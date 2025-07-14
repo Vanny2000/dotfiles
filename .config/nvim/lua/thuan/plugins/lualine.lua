@@ -50,7 +50,7 @@ return {
 
 		require("lualine").setup({
 			options = {
-				theme = "everforest",
+				theme = "auto",
 				-- component_separators = "",
 				-- section_separators = { left = "", right = "" },
 				section_separators = { left = "", right = "" },
