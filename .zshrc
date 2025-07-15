@@ -117,6 +117,8 @@ source $ZSH/oh-my-zsh.sh
  alias dots='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
  alias man="tldr"
  alias telegram="TERM=xterm-256color nchat"
+ alias dots='/usr/bin/git --git-dir=/Users/thuan/dotfiles/ --work-tree=/Users/thuan'
+ alias air="~/go/bin/air"
  # ---- Eza (better ls) -----
 
  alias ls="eza --icons=auto"
@@ -193,7 +195,6 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # setting up env secrets
 [ -f ~/.zsh_secrets ] && source ~/.zsh_secrets
 
-alias dots='/usr/bin/git --git-dir=/Users/thuan/dotfiles/ --work-tree=/Users/thuan'
 eval "$(starship init zsh)"
 
 
