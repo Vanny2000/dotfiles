@@ -1,5 +1,5 @@
 return {
-	"epwalsh/obsidian.nvim",
+	"obsidian-nvim/obsidian.nvim",
 	version = "*", -- recommended, use latest release instead of latest commit
 	lazy = true,
 	ft = "markdown",
@@ -25,13 +25,17 @@ return {
 		-- see below for full list of optional dependencies 👇
 	},
 	opts = {
-		picker = {},
+		picker = {
+			-- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', 'mini.pick' or 'snacks.pick'.
+			name = "snacks.pick",
+		},
 		workspaces = {
 			{
 				name = "notes",
 				path = "~/Obsidian/The Brain",
 			},
-		}, -- Optional, for templates (see below).
+		},
+		-- Optional, for templates (see below).
 		templates = {
 			folder = "Templates",
 			date_format = "%Y-%m-%d",
