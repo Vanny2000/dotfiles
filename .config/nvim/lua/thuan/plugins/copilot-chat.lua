@@ -9,7 +9,7 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "gemini-2.5-pro",
+		model = "claude-3.7-sonnet",
 		auto_insert_mode = true,
 		question_header = "  " .. user .. " ",
 		answer_header = " ",
