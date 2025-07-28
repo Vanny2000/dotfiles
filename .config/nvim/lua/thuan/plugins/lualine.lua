@@ -62,6 +62,7 @@ return {
 				lualine_b = { "filename" },
 				lualine_c = {
 					{ get_tmux_window, icon = "" }, -- Add the tmux window component
+					"grapple",
 				},
 				lualine_x = {
 					{
