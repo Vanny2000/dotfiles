@@ -114,10 +114,8 @@ source $ZSH/oh-my-zsh.sh
  alias lab="~/bashscripts/cybersecurity-lab.sh"
  alias srb="~/bashscripts/shoprunback-setup.sh"
  alias n="nvim"
- alias dots='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
  alias man="tldr"
  alias telegram="TERM=xterm-256color nchat"
- alias dots='/usr/bin/git --git-dir=/Users/thuan/dotfiles/ --work-tree=/Users/thuan'
  alias air="~/go/bin/air"
  # ---- Eza (better ls) -----
 
