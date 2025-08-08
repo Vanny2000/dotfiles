@@ -48,7 +48,7 @@ sudo apt install stow git zsh neovim tmux
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.dotfiles
+git clone https://github.com/Vanny2000/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ```
 
