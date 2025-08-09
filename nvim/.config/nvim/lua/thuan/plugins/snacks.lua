@@ -27,8 +27,8 @@ return {
 		-- dim = {},
 		picker = {
 			enable = true,
-			-- hidden = true,
-			-- ignored = true,
+			hidden = true,
+			ignored = true,
 			sources = {
 				files = {
 					hidden = true,
