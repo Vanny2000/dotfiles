@@ -72,7 +72,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  zsh-autosuggestions
+  # zsh-autosuggestions
+  fzf-tab
   web-search
 )
 
@@ -125,6 +126,8 @@ eval "$(zoxide init zsh)"
 
 alias cd="z"
 
+# alias for deployer
+alias dep="vendor/bin/dep"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
