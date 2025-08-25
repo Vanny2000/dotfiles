@@ -81,12 +81,12 @@ return {
 		heading = {
 			width = "block",
 			backgrounds = {
+				"MiniStatusLineModeVisual",
+				"MiniStatusLineModeCommand",
+				"MiniStatusLineModeOther",
 				"MiniStatusLineModeNormal",
 				"MiniStatusLineModeInsert",
-				"MiniStatusLineModeOther",
 				"MiniStatusLineModeReplace",
-				"MiniStatusLineModeCommand",
-				"MiniStatusLineModeVisual",
 			},
 			sign = false,
 			left_pad = 1,

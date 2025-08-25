@@ -37,6 +37,15 @@ return {
 			completion = {
 				completeopt = "menu,menuone,preview,noselect",
 			},
+
+			window = {
+				completion = cmp.config.window.bordered({
+					scrollbar = "║", -- Custom scrollbar character
+					scrolloff = 2, -- Scrolloff padding
+				}),
+				documentation = cmp.config.window.bordered(),
+			},
+
 			snippet = { -- configure how nvim-cmp interacts with snippet engine
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
