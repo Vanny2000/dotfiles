@@ -9,7 +9,7 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "claude-3.5-sonnet",
+		model = "gpt-4o",
 		auto_insert_mode = true,
 		question_header = "  " .. user .. " ",
 		answer_header = " ",
