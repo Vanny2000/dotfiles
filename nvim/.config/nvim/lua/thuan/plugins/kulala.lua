@@ -18,7 +18,8 @@ return {
 			textHighlight = "WarningMsg", -- highlight group for request elapsed time
 		},
 		lsp = {
-			enable = false,
+			enable = true,
+			formatter = true,
 		},
 	},
 }

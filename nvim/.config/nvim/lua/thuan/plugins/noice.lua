@@ -35,6 +35,14 @@ return {
 				},
 				opts = { skip = true },
 			},
+			{
+				filter = {
+					event = "kulala",
+					kind = "error",
+					find = "Failed to format JSON",
+				},
+				opts = { skip = true },
+			},
 		},
 
 		-- you can enable a preset for easier configuration
