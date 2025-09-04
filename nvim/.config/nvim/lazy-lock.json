@@ -21,6 +21,7 @@
   "kulala.nvim": { "branch": "main", "commit": "9d3206dda077d24ef3e6a2e3578bc0c914b4944c" },
   "lazy.nvim": { "branch": "main", "commit": "6c3bda4aca61a13a9c63f1c1d1b16b9d3be90d7a" },
   "lazydocker.nvim": { "branch": "main", "commit": "495fbbbdb22d48f2649a4b58c432f58c7981e3e2" },
+  "log-highlight.nvim": { "branch": "main", "commit": "2538129ddbd0c4a35b8c6bb8486725bbc6d184b6" },
   "lspkind.nvim": { "branch": "master", "commit": "d79a1c3299ad0ef94e255d045bed9fa26025dab6" },
   "lualine.nvim": { "branch": "master", "commit": "a94fc68960665e54408fe37dcf573193c4ce82c9" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "c2465eb07db648026eee81005a659abe26e6d077" },
