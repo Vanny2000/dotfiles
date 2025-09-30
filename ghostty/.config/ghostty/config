@@ -1,5 +1,5 @@
 font-family = "Hacker Nerd Font Mono"
-font-size = 14
+font-size = 18
 
 window-decoration = true
 macos-titlebar-style = hidden
@@ -13,7 +13,7 @@ auto-update = check
 
 
 # theme related config
-theme = rose-pine
+theme = Rose Pine
 background-opacity = 0.5
 background-blur-radius = 7
 
