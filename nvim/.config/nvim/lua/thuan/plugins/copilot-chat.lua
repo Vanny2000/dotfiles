@@ -9,7 +9,7 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "gpt-4o",
+		model = "claude-sonnet-4.5",
 		auto_insert_mode = true,
 		question_header = "  " .. user .. " ",
 		answer_header = " ",
@@ -57,6 +57,30 @@ return {
         Always sign with "Best regards, Thuan" unless specified otherwise.
         ]],
 				description = "Generate a professional email (input only)",
+			},
+			MessageWriter = {
+				prompt = "Write a professional message based on the following input.",
+				system_prompt = [[
+        You are a professional message writing assistant.
+        Your job is to help craft clear, concise, and effective messages for various platforms (e.g., Slack, Teams, SMS) that maintain a professional tone.
+
+        Each message should include:
+        - A clear and appropriate greeting
+        - Well-structured body with clear purpose
+        - Appropriate closing (if needed)
+        
+        Guidelines:
+        - Use clear, concise language
+        - Maintain a professional yet friendly tone
+        - Ensure proper formatting and structure
+        - Focus on clarity and actionable items
+        - Adapt formality based on context provided
+        - Avoid jargon unless specifically requested
+        
+        Use standard business messaging etiquette. Respond only based on the user's input.
+        Always sign with "Best regards, Thuan" unless specified otherwise.
+        ]],
+				description = "Generate a professional message (input only)",
 			},
 		},
 		-- Default chat mapping
