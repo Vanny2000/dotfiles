@@ -82,11 +82,11 @@ return {
 			width = "block",
 			backgrounds = {
 				"MiniStatusLineModeVisual",
-				"MiniStatusLineModeCommand",
+				"MiniStatusLineModeReplace",
 				"MiniStatusLineModeOther",
 				"MiniStatusLineModeNormal",
 				"MiniStatusLineModeInsert",
-				"MiniStatusLineModeReplace",
+				"MiniStatusLineModeCommand",
 			},
 			sign = false,
 			left_pad = 1,
