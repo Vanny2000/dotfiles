@@ -4,6 +4,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+export PATH="$HOME/.composer/vendor/bin:$PATH"
 # Set name of the theme to load
 # ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -32,7 +33,6 @@ alias n="nvim"
 alias air="~/go/bin/air"
 alias ls="eza --icons=auto"
 alias cd="z"
-alias dep="vendor/bin/dep"
 
 # Zoxide
 eval "$(zoxide init zsh)"

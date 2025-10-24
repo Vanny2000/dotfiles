@@ -13,10 +13,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end, opts) -- show definition, references
 
 		opts.desc = "Go to declaration"
-		keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+		keymap.set("n", "gD", function()
+			Snacks.picker.lsp_declarations()
+		end, opts) -- go to declaration
 
 		opts.desc = "Show LSP definition"
-		keymap.set("n", "gd", vim.lsp.buf.definition, opts) -- show lsp definition
+		keymap.set("n", "gd", function()
+			Snacks.picker.lsp_definitions()
+		end, opts) -- show lsp definition
 
 		opts.desc = "Show LSP implementations"
 		keymap.set("n", "gi", function()
