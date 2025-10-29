@@ -5,6 +5,13 @@ return {
 		local conform = require("conform")
 
 		conform.setup({
+			formatters = {
+				kulala = {
+					command = "kulala-fmt",
+					args = { "format", "$FILENAME" },
+					stdin = false,
+				},
+			},
 			formatters_by_ft = {
 				javascript = { "prettier" },
 				typescript = { "prettier" },
@@ -23,6 +30,7 @@ return {
 				-- php = { "php_cs_fixer" }, -- Add php-cs-fixer for PHP and Laravel
 				blade = { "blade-formatter" }, -- Add blade-formatter blade files
 				go = { "gofmt" },
+				http = { "kulala" },
 			},
 			format_on_save = {
 				lsp_fallback = true,

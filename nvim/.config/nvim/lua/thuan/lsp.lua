@@ -43,9 +43,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			Snacks.picker.diagnostics()
 		end, opts) -- show  diagnostics for file
 
-		opts.desc = "Show line diagnostics"
-		keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
-
 		opts.desc = "Go to previous diagnostic"
 		keymap.set("n", "[d", function()
 			vim.diagnostic.jump({ count = -1, float = true })
@@ -69,12 +66,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
 local severity = vim.diagnostic.severity
 
 vim.diagnostic.config({
+	-- Change the Diagnostic symbols in the sign column (gutter)
 	signs = {
+		active = true,
 		text = {
-			[severity.ERROR] = " ",
-			[severity.WARN] = " ",
-			[severity.HINT] = "󰠠 ",
-			[severity.INFO] = " ",
+			[vim.diagnostic.severity.ERROR] = "",
+			[vim.diagnostic.severity.WARN] = "",
+			[vim.diagnostic.severity.HINT] = "󰟃",
+			[vim.diagnostic.severity.INFO] = "",
 		},
+	},
+	-- Use the default configuration
+	-- virtual_lines = true
+
+	-- Alternatively, customize specific options
+	virtual_lines = {
+		-- Only show virtual line diagnostics for the current cursor line
+		current_line = true,
 	},
 })
