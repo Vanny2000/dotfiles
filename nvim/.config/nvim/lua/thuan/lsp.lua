@@ -70,10 +70,10 @@ vim.diagnostic.config({
 	signs = {
 		active = true,
 		text = {
-			[vim.diagnostic.severity.ERROR] = "",
-			[vim.diagnostic.severity.WARN] = "",
-			[vim.diagnostic.severity.HINT] = "󰟃",
-			[vim.diagnostic.severity.INFO] = "",
+			[severity.ERROR] = "",
+			[severity.WARN] = "",
+			[severity.HINT] = "󰟃",
+			[severity.INFO] = "",
 		},
 	},
 	-- Use the default configuration
