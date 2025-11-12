@@ -1,0 +1,7 @@
+customCommands:
+  - key: <c-g>
+    description: Pick AI commit
+    command: aicommit2
+    context: files
+    subprocess: true
+    showOutput: true
