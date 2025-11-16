@@ -48,8 +48,5 @@ keymap.set("n", "n", "nzzzv", { desc = "Searching with centered view" })
 keymap.set("n", "N", "Nzzzv", { desc = "Searching with centered view" })
 keymap.set("n", "G", "Gzz", { desc = "Move to top and center the view" })
 
--- live servers
-keymap.set("n", "<leader>ls", "<cmd>LiveServerStart<CR>", { desc = "Start Live Server" })
-keymap.set("n", "<leader>lq", "<cmd>LiveServerStop<CR>", { desc = "Stop Live Server" })
 -- env operations
 keymap.set("n", "<leader>fe", "<cmd>e .env<CR>", { desc = "Open/Create .env file" })
