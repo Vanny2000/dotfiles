@@ -27,19 +27,10 @@ return {
 				liquid = { "prettier" },
 				lua = { "stylua" },
 				python = { "isort", "black" },
-				-- php = { "php_cs_fixer" }, -- Add php-cs-fixer for PHP and Laravel
+				php = { "pint" },
 				blade = { "blade-formatter" }, -- Add blade-formatter blade files
 				go = { "gofmt" },
 				http = { "kulala" },
-			},
-			format_on_save = {
-				lsp_fallback = true,
-				async = false,
-				timeout_ms = 2500,
-				filter = function()
-					-- Disable format on save for PHP
-					return vim.bo.filetype ~= "php"
-				end,
 			},
 		})
 
