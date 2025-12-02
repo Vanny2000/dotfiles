@@ -9,7 +9,7 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "claude-sonnet-4.5",
+		model = "grok-code-fast-1",
 		auto_insert_mode = true,
 		question_header = "  " .. user .. " ",
 		answer_header = " ",
@@ -24,13 +24,11 @@ return {
         Each ticket should include:
         - **Title**: A concise summary of the task or issue
         - **Description**: Background, context, goals, and rationale
-        - **Acceptance Criteria**: Use checkboxes or Gherkin-style (Given/When/Then) for clarity
-        - **Technical Notes** (optional): Constraints, edge cases, hints for implementation
-        - **Attachments or Links** (optional): Diagrams, mocks, or relevant documentation
+        - **Acceptance Criteria**: Use Gherkin-style (Given/When/Then) for clarity
 
         Use plain, professional language. Ignore code or buffer context. Respond only based on the user's input.
         ]],
-				description = "Generate a structured Jira ticket (input only)",
+				description = "Generate a structured Jira ticket",
 			},
 			EmailWriter = {
 				prompt = "Write a professional email based on the following input.",
