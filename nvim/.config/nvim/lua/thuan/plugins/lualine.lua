@@ -39,14 +39,6 @@ return {
 			},
 		}
 
-		local function get_tmux_window()
-			local handle = io.popen("tmux display-message -p '#W'")
-			---@diagnostic disable-next-line: need-check-nil
-			local result = handle:read("*a")
-			---@diagnostic disable-next-line: need-check-nil
-			handle:close()
-			return result:gsub("\n", "") -- Remove any trailing newline
-		end
 
 		require("lualine").setup({
 			options = {
@@ -59,9 +51,8 @@ return {
 
 			sections = {
 				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
-				lualine_b = { "filename" },
+        lualine_b = { {"filename", path = 1,} },
 				lualine_c = {
-					{ get_tmux_window, icon = "" }, -- Add the tmux window component
 					"grapple",
 				},
 				lualine_x = {
