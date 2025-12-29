@@ -20,26 +20,6 @@ return {
 			gray = "#928374",
 		}
 
-		local bubbles_theme = {
-			normal = {
-				a = { fg = colors.bg0_hard, bg = colors.blue, gui = "bold" },
-				b = { fg = colors.fg1, bg = colors.bg2 },
-				c = { fg = colors.fg1, bg = colors.bg0_hard },
-			},
-
-			insert = { a = { fg = colors.bg0_hard, bg = colors.green, gui = "bold" } },
-			visual = { a = { fg = colors.bg0_hard, bg = colors.orange, gui = "bold" } },
-			replace = { a = { fg = colors.bg0_hard, bg = colors.red, gui = "bold" } },
-			command = { a = { fg = colors.bg0_hard, bg = colors.yellow, gui = "bold" } },
-
-			inactive = {
-				a = { fg = colors.gray, bg = colors.bg1 },
-				b = { fg = colors.gray, bg = colors.bg1 },
-				c = { fg = colors.gray, bg = colors.bg0_hard },
-			},
-		}
-
-
 		require("lualine").setup({
 			options = {
 				theme = "auto",
@@ -51,9 +31,25 @@ return {
 
 			sections = {
 				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
-        lualine_b = { {"filename", path = 1,} },
+        lualine_b = { {"filename", path = 0} },
 				lualine_c = {
 					"grapple",
+          -- floaterm status
+					{
+						function()
+							local status = _G.floaterm_status and _G.floaterm_status()
+							if not status then
+								return ""
+							end
+							return string.format("%s %d/%d", status.name, status.index, status.count)
+						end,
+						cond = function()
+							return _G.floaterm_status and _G.floaterm_status() ~= nil
+						end,
+						color = { fg = "#1f1d2e", bg = "#ebbcba" },
+						separator = { left = "", right = "" },
+            padding = 1,
+					},
 				},
 				lualine_x = {
 					{
