@@ -29,7 +29,7 @@ description: >-
   component for best practices and potential issues."
 
   </example>
-mode: all
+mode: subagent
 tools:
   write: false
   edit: false
