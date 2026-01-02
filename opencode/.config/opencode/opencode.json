@@ -7,10 +7,6 @@
       "oauth": {}
     }
   },
-  "permission": {
-    "edit": "ask",
-    "bash": "ask"
-  },
   "default_agent": "plan",
   "keybinds": {
     "leader": "ctrl+x",
