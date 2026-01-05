@@ -9,7 +9,7 @@
   },
   "default_agent": "plan",
   "keybinds": {
-    "leader": "ctrl+x",
+    "leader": "ctrl+a",
     "app_exit": "ctrl+c,<leader>q",
     "editor_open": "<leader>e",
     "theme_list": "<leader>t",
