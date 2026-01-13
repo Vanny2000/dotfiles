@@ -7,6 +7,7 @@
       "oauth": {}
     }
   },
+  "plugin": ["@franlol/opencode-md-table-formatter@0.0.3"],
   "default_agent": "plan",
   "keybinds": {
     "leader": "ctrl+a",

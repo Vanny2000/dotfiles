@@ -101,3 +101,10 @@ eval "$(starship init zsh)"
 
 # Pipx bin path
 export PATH="$PATH:$HOME/.local/bin"
+
+# bun completions
+[ -s "/Users/thuan/.bun/_bun" ] && source "/Users/thuan/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
