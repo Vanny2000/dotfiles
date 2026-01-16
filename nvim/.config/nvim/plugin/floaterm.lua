@@ -1,3 +1,5 @@
+-- Enter Vim mode in the floating terminal
+vim.keymap.set("t", ",,", "<c-\\><c-n>")
 -- Word lists for dynamic name generation
 local adjectives = {
 	"swift", "lazy", "async", "static", "atomic", "cosmic", "hyper", "mega", "nano", "turbo",

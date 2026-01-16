@@ -20,6 +20,7 @@ return {
 				system_prompt = [[
         You are a professional Jira ticket writer assisting software development teams. 
         Your job is to generate clear, complete, and structured Jira tickets that developers and QA engineers can act on immediately.
+        Write the ticket base on the context provided and your understanding of best practices, do not ask to see more files or information.
 
         Each ticket should include:
         - **Title**: A concise summary of the task or issue
