@@ -66,7 +66,7 @@ return {
 			-- The default folder to place images in via `:ObsidianPasteImg`.
 			-- If this is a relative path it will be interpreted as relative to the vault root.
 			-- You can always override this per image by passing a full path to the command instead of just a filename.
-			img_folder = "assets/imgs", -- This is the default
+			folder = "assets/imgs", -- This is the default
 
 			-- Optional, customize the default name or prefix when pasting images via `:ObsidianPasteImg`.
 			---@return string
