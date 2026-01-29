@@ -9,10 +9,12 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "claude-sonnet-4.5",
+		model = "grok-code-fast-1",
 		auto_insert_mode = true,
-		question_header = "  " .. user .. " ",
-		answer_header = " ",
+    headers = {
+      user = "  " .. user .. " ",
+      assistant = " ",
+    },
 		error_header = "🚨",
 		prompts = {
 			JiraTicketWriter = {

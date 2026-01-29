@@ -33,6 +33,7 @@ alias n="nvim"
 alias air="~/go/bin/air"
 alias ls="eza --icons=auto"
 alias cd="z"
+alias ts="tailscale"
 
 # Zoxide
 eval "$(zoxide init zsh)"
