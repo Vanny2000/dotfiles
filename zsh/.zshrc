@@ -1,3 +1,10 @@
+# OPENSPEC:START
+# OpenSpec shell completions configuration
+fpath=("/Users/thuan/.oh-my-zsh/custom/completions" $fpath)
+autoload -Uz compinit
+compinit
+# OPENSPEC:END
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -34,6 +41,7 @@ alias air="~/go/bin/air"
 alias ls="eza --icons=auto"
 alias cd="z"
 alias ts="tailscale"
+alias bt="Budget_Tracker"
 
 # Zoxide
 eval "$(zoxide init zsh)"
