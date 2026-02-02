@@ -21,5 +21,9 @@ return {
 			enable = true,
 			formatter = true,
 		},
+
+    ui = {
+      max_response_size = 65536, -- in bytes, default 32768 (32 KB)
+    }
 	},
 }
