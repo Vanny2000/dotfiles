@@ -9,7 +9,7 @@ return {
 	},
 	build = "make tiktoken",
 	opts = {
-		model = "grok-code-fast-1",
+		model = "gpt-4o",
 		auto_insert_mode = true,
     headers = {
       user = "  " .. user .. " ",
