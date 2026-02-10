@@ -42,6 +42,7 @@ alias ls="eza --icons=auto"
 alias cd="z"
 alias ts="tailscale"
 alias bt="Budget_Tracker"
+alias cc="claude --dangerously-skip-permissions"
 
 # Zoxide
 eval "$(zoxide init zsh)"

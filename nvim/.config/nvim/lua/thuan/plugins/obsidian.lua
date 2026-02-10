@@ -91,6 +91,6 @@ return {
 		},
 
 		-- see below for full list of options 👇
-    legacy_command = false,
+    legacy_commands = false,
 	},
 }
