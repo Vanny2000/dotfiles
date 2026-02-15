@@ -1,0 +1,195 @@
+#!/usr/bin/env zsh
+
+# =============================================================================
+# claude-worktree
+#
+# Spawns parallel Claude CLI agents in git worktrees. Each worktree gets its
+# own tmux window running neovim, with Claude launched in nvim's floating
+# terminal via leader+tt keymap.
+#
+# On first creation, the worktree project is automatically set up by
+# setup-worktree-project.sh (installs deps, copies .env, runs migrations, etc).
+#
+# Worktrees are created as direct siblings of the main repo so that Herd
+# auto-serves each one without any manual linking:
+#
+#   Herd/
+#   ├── backend-v3-local/                    # main repo  → backend-v3-local.test
+#   ├── backend-v3-local-feat-auth/          # worktree   → backend-v3-local-feat-auth.test
+#   ├── backend-v3-local-feat-dashboard/     # worktree   → backend-v3-local-feat-dashboard.test
+#   ├── backend-v3-local-fix-n-plus-1/       # worktree   → backend-v3-local-fix-n-plus-1.test
+#
+# Usage:
+#   cw <branch-name> ["optional prompt"]
+#
+# Examples:
+#   cw feat/auth "implement JWT auth with refresh tokens"   # autonomous
+#   cw feat/dashboard                                        # manual prompt
+#
+# Setup:
+#   1. Place scripts in ~/scripts/:
+#        ~/scripts/claude-worktree.sh
+#        ~/scripts/setup-worktree-project.sh
+#   2. chmod +x ~/scripts/claude-worktree.sh ~/scripts/setup-worktree-project.sh
+#   3. Add to your .zshrc:
+#        alias cw="~/scripts/claude-worktree.sh"
+#   4. Reload: source ~/.zshrc
+#
+# Tmux navigation (once attached):
+#   ctrl-b w       → list all windows (bird's-eye view of all agents)
+#   ctrl-b n / p   → next / previous window
+#   ctrl-b <num>   → jump to window by number
+#
+# ⚠️  The leader+tt automation is inherently fragile — it simulates keypresses
+#     into neovim via tmux. If nvim hasn't fully loaded yet, it'll miss them.
+#     Increase NVIM_STARTUP_DELAY if your config is heavy.
+#
+# =============================================================================
+
+set -e
+
+# --- Configuration ---
+
+# How long to wait (seconds) for neovim to fully load before sending keys.
+# Increase this if your nvim config has heavy plugins / lazy loading.
+NVIM_STARTUP_DELAY=2
+
+# Your leader key. Space is sent as "Space" in tmux send-keys.
+# Change this if your leader is something else (e.g. "," or "\")
+LEADER_KEY="Space"
+
+# Path to the project setup script that detects project type and installs deps
+SETUP_SCRIPT="${HOME}/scripts/setup-worktree-project.sh"
+
+
+BRANCH="$1"
+PROMPT="$2"
+
+# --- Validate input ---
+if [[ -z "$BRANCH" ]]; then
+  echo "Usage: cw <branch> [\"prompt\"]"
+  echo ""
+  echo "Examples:"
+  echo "  cw feat/auth \"implement JWT auth\"   # claude works autonomously"
+  echo "  cw feat/dashboard                     # you prompt claude manually"
+  exit 1
+fi
+
+# --- Resolve repo paths ---
+# Get the root of the current git repo
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ -z "$REPO_ROOT" ]]; then
+  echo "Error: not inside a git repository"
+  exit 1
+fi
+
+REPO_NAME=$(basename "$REPO_ROOT")
+
+# Sanitize branch name for filesystem + tmux (feat/auth → feat-auth)
+BRANCH_SLUG="${BRANCH//\//-}"
+
+# Worktrees are direct siblings of the main repo so Herd auto-serves them.
+# e.g. Herd/myapp/ → Herd/myapp-feat-auth/
+# This means each worktree gets its own .test domain automatically.
+WORKTREE_PATH="${REPO_ROOT}/../${REPO_NAME}-${BRANCH_SLUG}"
+
+# --- Determine tmux session ---
+# If we're already inside tmux, use the current session.
+# Otherwise, create/attach to a session named after the repo.
+if [[ -n "$TMUX" ]]; then
+  # Already inside tmux — extract current session name
+  SESSION_NAME=$(tmux display-message -p '#S')
+  echo "• Using current tmux session: $SESSION_NAME"
+else
+  # Not in tmux — use repo name as session, create if needed
+  SESSION_NAME="${REPO_NAME}"
+  if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    tmux new-session -d -s "$SESSION_NAME"
+    echo "✓ Created tmux session: $SESSION_NAME"
+  fi
+fi
+
+WINDOW_NAME="${BRANCH_SLUG}"
+
+# --- Create the worktree if it doesn't exist ---
+# Track whether this is a fresh worktree so we know to run setup
+IS_NEW_WORKTREE=false
+
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+  git worktree add -b "$BRANCH" "$WORKTREE_PATH"
+  IS_NEW_WORKTREE=true
+  echo "✓ Created worktree: $WORKTREE_PATH"
+else
+  echo "• Worktree already exists, reusing: $WORKTREE_PATH"
+fi
+
+# --- Run project setup on new worktrees ---
+# Detects project type (Laravel, Node, Python, etc) and installs dependencies,
+# copies .env and other untracked config files, runs migrations, etc.
+# Only runs on fresh worktrees to avoid redundant installs on re-attach.
+if [[ "$IS_NEW_WORKTREE" == true && -x "$SETUP_SCRIPT" ]]; then
+  echo ""
+  echo "━━━ Setting up project ━━━"
+  "$SETUP_SCRIPT" "$WORKTREE_PATH" "$REPO_ROOT"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+elif [[ "$IS_NEW_WORKTREE" == true && ! -x "$SETUP_SCRIPT" ]]; then
+  echo "⚠ Setup script not found or not executable: $SETUP_SCRIPT"
+  echo "  Run: chmod +x $SETUP_SCRIPT"
+fi
+
+# --- Create tmux window for this worktree ---
+# Check if a window with this name already exists to avoid duplicates
+if tmux list-windows -t "$SESSION_NAME" -F '#{window_name}' | grep -qx "$WINDOW_NAME"; then
+  echo "• Window '${WINDOW_NAME}' already exists, switching to it"
+  tmux select-window -t "${SESSION_NAME}:${WINDOW_NAME}"
+else
+  tmux new-window -d -t "$SESSION_NAME" -n "$WINDOW_NAME" -c "$WORKTREE_PATH"
+  echo "✓ Created tmux window: $WINDOW_NAME"
+fi
+
+# --- Launch neovim in the worktree ---
+# cd into the worktree first, then open nvim.
+# The cd ensures nvim's working directory is correct for LSP, git, etc.
+tmux send-keys -t "${SESSION_NAME}:${WINDOW_NAME}" "cd ${WORKTREE_PATH} && nvim ." Enter
+
+# --- Open floating terminal via leader+tt and launch Claude ---
+# Wait for neovim to finish loading before sending keystrokes.
+# This is the fragile part — adjust NVIM_STARTUP_DELAY if keys are missed.
+echo "• Waiting ${NVIM_STARTUP_DELAY}s for neovim to start..."
+sleep "$NVIM_STARTUP_DELAY"
+
+# Send leader+tt to trigger the floating terminal keymap
+# tmux send-keys interprets "Space" as the space bar, "t" as literal t
+tmux send-keys -t "${SESSION_NAME}:${WINDOW_NAME}" "$LEADER_KEY" "t" "t"
+
+# Small delay for the floating terminal to actually open
+sleep 0.5
+
+# --- Send Claude command into the floating terminal ---
+if [[ -n "$PROMPT" ]]; then
+  # Autonomous mode: skip permission prompts, claude starts working immediately.
+  tmux send-keys -t "${SESSION_NAME}:${WINDOW_NAME}" \
+    "claude --dangerously-skip-permissions \"${PROMPT}\"" Enter
+  echo "✓ Claude launched autonomously with prompt"
+else
+  # Manual mode: just launch claude, you'll prompt it yourself.
+  # Switch to this window and interact directly in the floating terminal.
+  tmux send-keys -t "${SESSION_NAME}:${WINDOW_NAME}" "claude" Enter
+  echo "✓ Claude launched in manual mode (switch to window and prompt it)"
+fi
+
+# --- Summary ---
+# Show the user everything they need to know to find and review this worktree
+HERD_URL="${REPO_NAME}-${BRANCH_SLUG}.test"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Branch:  $BRANCH"
+echo "  Tree:    $WORKTREE_PATH"
+echo "  Window:  ${SESSION_NAME}:${WINDOW_NAME}"
+echo "  Herd:    http://${HERD_URL}"
+if [[ -z "$TMUX" ]]; then
+  echo "  Attach:  tmux attach -t ${SESSION_NAME}"
+fi
+echo "  List:    ctrl-b w (all windows/agents)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

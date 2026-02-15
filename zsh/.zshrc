@@ -43,7 +43,7 @@ alias cd="z"
 alias ts="tailscale"
 alias bt="Budget_Tracker"
 alias cc="claude --dangerously-skip-permissions"
-
+alias cw="claude-worktree"
 # Zoxide
 eval "$(zoxide init zsh)"
 

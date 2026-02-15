@@ -1,0 +1,315 @@
+#!/usr/bin/env zsh
+
+# =============================================================================
+# setup-worktree-project.sh
+#
+# Detects the project type in a worktree and runs the appropriate setup
+# commands (dependency install, env config, build steps, etc).
+#
+# Called automatically by claude-worktree.sh after creating a new worktree,
+# or can be run standalone in any project directory.
+#
+# Usage:
+#   ~/scripts/setup-worktree-project.sh <worktree-path> <main-repo-path>
+#
+# Supported project types:
+#   - Laravel (composer + artisan)
+#   - Node.js / Next.js / Nuxt / Astro (npm / yarn / pnpm / bun)
+#   - Python (pip / poetry / pipenv / uv)
+#   - Ruby / Rails (bundler)
+#   - Go
+#   - Rust
+#   - Elixir / Phoenix (mix)
+#   - Flutter / Dart
+#
+# A project can be multiple types at once (e.g. Laravel + Node for frontend).
+# Each detector runs independently so combo projects are handled naturally.
+#
+# =============================================================================
+
+set -e
+
+WORKTREE_PATH="$1"
+MAIN_REPO_PATH="$2"
+
+if [[ -z "$WORKTREE_PATH" ]]; then
+  echo "Usage: setup-worktree-project.sh <worktree-path> [main-repo-path]"
+  exit 1
+fi
+
+# Resolve to absolute path to avoid issues with cd
+WORKTREE_PATH=$(cd "$WORKTREE_PATH" && pwd)
+if [[ -n "$MAIN_REPO_PATH" ]]; then
+  MAIN_REPO_PATH=$(cd "$MAIN_REPO_PATH" && pwd)
+fi
+
+cd "$WORKTREE_PATH"
+
+# Track what we detected so we can summarize at the end
+DETECTED=()
+
+# =============================================================================
+# Helper: copy a file from main repo if it exists and isn't in the worktree.
+# Worktrees share git state (tracked files) but NOT untracked files like
+# .env, secrets, etc. This ensures the worktree has the config it needs.
+# =============================================================================
+copy_from_main() {
+  local file="$1"
+  if [[ -n "$MAIN_REPO_PATH" && -f "${MAIN_REPO_PATH}/${file}" && ! -f "${WORKTREE_PATH}/${file}" ]]; then
+    # Create parent directory if needed (e.g. config/master.key)
+    mkdir -p "$(dirname "${WORKTREE_PATH}/${file}")"
+    cp "${MAIN_REPO_PATH}/${file}" "${WORKTREE_PATH}/${file}"
+    echo "  ✓ Copied ${file} from main repo"
+  fi
+}
+
+# =============================================================================
+# Helper: detect which package manager to use for Node.js projects.
+# Checks for lockfiles in priority order — the lockfile is the source of truth.
+# =============================================================================
+detect_node_package_manager() {
+  if [[ -f "bun.lockb" || -f "bun.lock" ]]; then
+    echo "bun"
+  elif [[ -f "pnpm-lock.yaml" ]]; then
+    echo "pnpm"
+  elif [[ -f "yarn.lock" ]]; then
+    echo "yarn"
+  else
+    echo "npm"
+  fi
+}
+
+# =============================================================================
+# Helper: detect which Python package manager to use.
+# Priority: uv > poetry > pipenv > pip (based on lockfile presence)
+# =============================================================================
+detect_python_package_manager() {
+  if [[ -f "uv.lock" ]] && command -v uv &>/dev/null; then
+    echo "uv"
+  elif [[ -f "Pipfile" || -f "Pipfile.lock" ]]; then
+    echo "pipenv"
+  elif [[ -f "poetry.lock" ]] && command -v poetry &>/dev/null; then
+    echo "poetry"
+  elif [[ -f "requirements.txt" || -f "setup.py" || -f "setup.cfg" || -f "pyproject.toml" ]]; then
+    echo "pip"
+  else
+    echo ""
+  fi
+}
+
+# =============================================================================
+# PHP / Laravel
+# =============================================================================
+if [[ -f "composer.json" ]]; then
+  DETECTED+=("PHP/Composer")
+
+  # Copy common untracked PHP config files from main repo
+  copy_from_main ".env"
+  copy_from_main "auth.json"
+
+  echo "📦 Running composer install..."
+  composer install --no-interaction --quiet 2>/dev/null || composer install --no-interaction
+
+  # --- Laravel-specific setup ---
+  if [[ -f "artisan" ]]; then
+    DETECTED+=("Laravel")
+
+    # Generate app key if .env exists but APP_KEY is empty
+    if [[ -f ".env" ]] && grep -q "^APP_KEY=$" .env; then
+      echo "🔑 Generating Laravel app key..."
+      php artisan key:generate --quiet
+    fi
+
+    # Run migrations if we have a database configured
+    if [[ -f ".env" ]]; then
+      echo "🗃️  Running Laravel migrations..."
+      php artisan migrate --quiet --no-interaction 2>/dev/null || echo "  ⚠ Migrations skipped (DB not available)"
+    fi
+
+    # Clear and rebuild caches for a clean state in the worktree
+    echo "🧹 Clearing Laravel caches..."
+    php artisan optimize:clear --quiet 2>/dev/null
+  fi
+fi
+
+# =============================================================================
+# Node.js / Frontend frameworks
+# =============================================================================
+if [[ -f "package.json" ]]; then
+  PM=$(detect_node_package_manager)
+  DETECTED+=("Node.js (${PM})")
+
+  # Copy common untracked Node config files
+  copy_from_main ".env"
+  copy_from_main ".env.local"
+  copy_from_main ".env.development.local"
+
+  echo "📦 Running ${PM} install..."
+  case "$PM" in
+    bun)
+      bun install --silent 2>/dev/null || bun install
+      ;;
+    pnpm)
+      pnpm install --silent 2>/dev/null || pnpm install
+      ;;
+    yarn)
+      yarn install --silent 2>/dev/null || yarn install
+      ;;
+    npm)
+      npm install --silent 2>/dev/null || npm install
+      ;;
+  esac
+
+  # Detect specific frameworks for any additional setup steps
+  if [[ -f "next.config.js" || -f "next.config.mjs" || -f "next.config.ts" ]]; then
+    DETECTED+=("Next.js")
+  fi
+  if [[ -f "nuxt.config.ts" || -f "nuxt.config.js" ]]; then
+    DETECTED+=("Nuxt")
+    echo "🔧 Preparing Nuxt..."
+    npx nuxi prepare 2>/dev/null || true
+  fi
+  if [[ -f "astro.config.mjs" || -f "astro.config.ts" ]]; then
+    DETECTED+=("Astro")
+  fi
+fi
+
+# =============================================================================
+# Python
+# =============================================================================
+PYTHON_PM=$(detect_python_package_manager)
+if [[ -n "$PYTHON_PM" ]]; then
+  DETECTED+=("Python (${PYTHON_PM})")
+
+  copy_from_main ".env"
+
+  echo "🐍 Setting up Python project with ${PYTHON_PM}..."
+  case "$PYTHON_PM" in
+    uv)
+      uv sync 2>/dev/null || uv install
+      ;;
+    poetry)
+      poetry install --no-interaction --quiet 2>/dev/null || poetry install --no-interaction
+      ;;
+    pipenv)
+      pipenv install --dev 2>/dev/null || pipenv install
+      ;;
+    pip)
+      # Create a virtual environment if one doesn't already exist
+      if [[ ! -d "venv" && ! -d ".venv" ]]; then
+        echo "  Creating virtual environment..."
+        python3 -m venv .venv
+      fi
+      # Activate the venv and install dependencies
+      if [[ -d ".venv" ]]; then
+        source .venv/bin/activate
+      elif [[ -d "venv" ]]; then
+        source venv/bin/activate
+      fi
+      if [[ -f "requirements.txt" ]]; then
+        pip install -r requirements.txt --quiet 2>/dev/null || pip install -r requirements.txt
+      fi
+      if [[ -f "requirements-dev.txt" ]]; then
+        pip install -r requirements-dev.txt --quiet 2>/dev/null || true
+      fi
+      ;;
+  esac
+
+  # --- Django-specific setup ---
+  if [[ -f "manage.py" ]]; then
+    DETECTED+=("Django")
+    echo "🗃️  Running Django migrations..."
+    python manage.py migrate --no-input 2>/dev/null || echo "  ⚠ Migrations skipped"
+  fi
+fi
+
+# =============================================================================
+# Ruby / Rails
+# =============================================================================
+if [[ -f "Gemfile" ]]; then
+  DETECTED+=("Ruby/Bundler")
+
+  # Rails keeps secrets in these untracked files
+  copy_from_main ".env"
+  copy_from_main "master.key"
+  copy_from_main "config/master.key"
+  copy_from_main "config/credentials.yml.enc"
+
+  echo "💎 Running bundle install..."
+  bundle install --quiet 2>/dev/null || bundle install
+
+  # --- Rails-specific setup ---
+  if [[ -f "bin/rails" ]]; then
+    DETECTED+=("Rails")
+    echo "🗃️  Running Rails db:prepare..."
+    bin/rails db:prepare 2>/dev/null || echo "  ⚠ DB setup skipped"
+  fi
+fi
+
+# =============================================================================
+# Go
+# =============================================================================
+if [[ -f "go.mod" ]]; then
+  DETECTED+=("Go")
+
+  echo "🔧 Running go mod download..."
+  go mod download 2>/dev/null || go mod download
+
+  # Tidy up in case the worktree branch has diverged
+  go mod tidy 2>/dev/null || true
+fi
+
+# =============================================================================
+# Rust
+# =============================================================================
+if [[ -f "Cargo.toml" ]]; then
+  DETECTED+=("Rust")
+
+  echo "🦀 Running cargo fetch..."
+  cargo fetch --quiet 2>/dev/null || cargo fetch
+fi
+
+# =============================================================================
+# Elixir / Phoenix
+# =============================================================================
+if [[ -f "mix.exs" ]]; then
+  DETECTED+=("Elixir/Mix")
+
+  copy_from_main ".env"
+  copy_from_main "config/dev.secret.exs"
+  copy_from_main "config/prod.secret.exs"
+
+  echo "🧪 Running mix deps.get..."
+  mix deps.get --quiet 2>/dev/null || mix deps.get
+
+  # --- Phoenix-specific setup ---
+  if grep -q "phoenix" mix.exs 2>/dev/null; then
+    DETECTED+=("Phoenix")
+    echo "🗃️  Running Phoenix setup..."
+    mix ecto.setup 2>/dev/null || echo "  ⚠ Ecto setup skipped"
+  fi
+fi
+
+# =============================================================================
+# Flutter / Dart
+# =============================================================================
+if [[ -f "pubspec.yaml" ]]; then
+  DETECTED+=("Flutter/Dart")
+
+  echo "🎯 Running flutter pub get..."
+  if command -v flutter &>/dev/null; then
+    flutter pub get 2>/dev/null || flutter pub get
+  elif command -v dart &>/dev/null; then
+    dart pub get 2>/dev/null || dart pub get
+  fi
+fi
+
+# =============================================================================
+# Summary — show what was detected and set up
+# =============================================================================
+echo ""
+if [[ ${#DETECTED[@]} -eq 0 ]]; then
+  echo "⚠ No recognized project type detected. Skipping setup."
+else
+  echo "✓ Project setup complete: ${(j:, :)DETECTED}"
+fi
