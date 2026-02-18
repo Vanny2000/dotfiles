@@ -59,7 +59,7 @@ NVIM_STARTUP_DELAY=2
 LEADER_KEY="Space"
 
 # Path to the project setup script that detects project type and installs deps
-SETUP_SCRIPT="${HOME}/scripts/setup-worktree-project.sh"
+SETUP_SCRIPT="setup-worktree-project"
 
 
 BRANCH="$1"
