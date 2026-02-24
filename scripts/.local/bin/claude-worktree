@@ -127,15 +127,15 @@ fi
 # Detects project type (Laravel, Node, Python, etc) and installs dependencies,
 # copies .env and other untracked config files, runs migrations, etc.
 # Only runs on fresh worktrees to avoid redundant installs on re-attach.
-if [[ "$IS_NEW_WORKTREE" == true && -x "$SETUP_SCRIPT" ]]; then
+if [[ "$IS_NEW_WORKTREE" == true ]] && command -v "$SETUP_SCRIPT" &>/dev/null; then
   echo ""
   echo "━━━ Setting up project ━━━"
   "$SETUP_SCRIPT" "$WORKTREE_PATH" "$REPO_ROOT"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-elif [[ "$IS_NEW_WORKTREE" == true && ! -x "$SETUP_SCRIPT" ]]; then
-  echo "⚠ Setup script not found or not executable: $SETUP_SCRIPT"
-  echo "  Run: chmod +x $SETUP_SCRIPT"
+elif [[ "$IS_NEW_WORKTREE" == true ]]; then
+  echo "⚠ Setup script not found in PATH: $SETUP_SCRIPT"
+  echo "  Ensure ~/.local/bin is in your PATH and the script is executable"
 fi
 
 # --- Create tmux window for this worktree ---
