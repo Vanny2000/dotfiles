@@ -116,7 +116,11 @@ WINDOW_NAME="${BRANCH_SLUG}"
 IS_NEW_WORKTREE=false
 
 if [[ ! -d "$WORKTREE_PATH" ]]; then
-  git worktree add -b "$BRANCH" "$WORKTREE_PATH"
+  if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+    git worktree add "$WORKTREE_PATH" "$BRANCH"
+  else
+    git worktree add -b "$BRANCH" "$WORKTREE_PATH"
+  fi
   IS_NEW_WORKTREE=true
   echo "✓ Created worktree: $WORKTREE_PATH"
 else
