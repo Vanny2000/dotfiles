@@ -1,6 +1,13 @@
 # OPENSPEC:START
 # OpenSpec shell completions configuration
-fpath=("/Users/thuan/.oh-my-zsh/custom/completions" $fpath)
+fpath=(
+  /opt/homebrew/share/zsh/site-functions
+  $HOME/.oh-my-zsh/custom/completions
+  $fpath
+)
+
+typeset -U fpath
+
 autoload -Uz compinit
 compinit
 # OPENSPEC:END
