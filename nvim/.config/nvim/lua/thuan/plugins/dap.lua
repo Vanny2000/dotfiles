@@ -24,6 +24,9 @@ return {
 				request = "launch",
 				name = "Listen for Xdebug",
 				port = 9003,
+				pathMappings = {
+					["/var/www/html"] = "${workspaceFolder}",
+				},
 			},
 		}
 		-- Go Debugging Configuration

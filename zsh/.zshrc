@@ -18,7 +18,7 @@ compinit
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 export XDG_CONFIG_HOME="$HOME/.config"
-export PATH="$HOME/.composer/vendor/bin:$PATH"
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 # Set name of the theme to load
 # ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -59,22 +59,22 @@ eval "$(zoxide init zsh)"
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
 
 # Docker Desktop (mac only)
-[ -f "/Users/thuan/.docker/init-zsh.sh" ] && source "/Users/thuan/.docker/init-zsh.sh"
+[ -f "$HOME/.docker/init-zsh.sh" ] && source "$HOME/.docker/init-zsh.sh"
 
 # Herd PHP binaries/config (mac only)
-if [ -d "/Users/thuan/Library/Application Support/Herd" ]; then
-  export PATH="/Users/thuan/Library/Application Support/Herd/bin/:$PATH"
-  export HERD_PHP_82_INI_SCAN_DIR="/Users/thuan/Library/Application Support/Herd/config/php/82/"
-  export HERD_PHP_74_INI_SCAN_DIR="/Users/thuan/Library/Application Support/Herd/config/php/74/"
-  export HERD_PHP_81_INI_SCAN_DIR="/Users/thuan/Library/Application Support/Herd/config/php/81/"
-  export HERD_PHP_80_INI_SCAN_DIR="/Users/thuan/Library/Application Support/Herd/config/php/80/"
-  export HERD_PHP_83_INI_SCAN_DIR="/Users/thuan/Library/Application Support/Herd/config/php/83/"
+if [ -d "$HOME/Library/Application Support/Herd" ]; then
+  export PATH="$HOME/Library/Application Support/Herd/bin/:$PATH"
+  export HERD_PHP_82_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/82/"
+  export HERD_PHP_74_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/74/"
+  export HERD_PHP_81_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/81/"
+  export HERD_PHP_80_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/80/"
+  export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
 fi
 
 # Editor
@@ -120,7 +120,7 @@ eval "$(starship init zsh)"
 export PATH="$PATH:$HOME/.local/bin"
 
 # bun completions
-[ -s "/Users/thuan/.bun/_bun" ] && source "/Users/thuan/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
