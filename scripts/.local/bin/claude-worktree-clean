@@ -131,8 +131,8 @@ cleanup_worktree() {
   # 1. Stop DDEV if running
   if [[ -d "${worktree_path}/.ddev" ]]; then
     echo "  🐳 Stopping DDEV..."
-    (cd "$worktree_path" && ddev stop --remove-data --omit-snapshot 2>/dev/null) \
-      || echo "  ⚠ DDEV stop failed (may already be stopped)"
+    (cd "$worktree_path" && ddev delete --omit-snapshot 2>/dev/null) \
+      || echo "  ⚠ DDEV delete failed (may already be deleted)"
   fi
 
   # 2. Close tmux window
