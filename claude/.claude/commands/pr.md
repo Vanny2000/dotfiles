@@ -1,0 +1,92 @@
+---
+allowed-tools: Bash(git log:*), Bash(git rev-parse:*), Bash(git remote:*), Bash(git diff:*), Bash(gh pr:*), Bash(gh api:*), Bash(glab mr:*), Bash(glab api:*)
+argument-hint: [optional: additional context for the PR/MR description]
+description: Creates a pull request (GitHub) or merge request (GitLab) for the current branch if one doesn't exist yet. Auto-detects the platform from the remote URL.
+---
+
+# Create PR/MR
+
+Create a pull request or merge request for the current branch if one doesn't already exist.
+
+## Step 1: Detect the platform
+
+Check the remote URL to determine whether this is a GitHub or GitLab project:
+
+```bash
+git remote get-url origin
+```
+
+- Contains `github.com` → **GitHub** (use `gh`)
+- Contains `gitlab.com` or other GitLab instance → **GitLab** (use `glab`)
+- If unclear, ask the user.
+
+## Step 2: Guard — must be on a feature branch
+
+```bash
+git rev-parse --abbrev-ref HEAD
+```
+
+If the current branch is `main`, `master`, `develop`, `development`, `production`, `prod`, `staging`, or `release` — stop and tell the user to switch to a feature branch first. Do NOT create a PR/MR from a protected branch.
+
+## Step 3: Check for an existing PR/MR
+
+**GitHub:**
+```bash
+gh pr view --json url 2>/dev/null
+```
+
+**GitLab:**
+```bash
+glab mr view 2>/dev/null
+```
+
+If a PR/MR already exists, output its URL and stop.
+
+## Step 4: Determine the base branch
+
+Identify the default branch of the repository:
+
+**GitHub:**
+```bash
+gh api repos/{owner}/{repo} --jq '.default_branch'
+```
+
+**GitLab:**
+```bash
+glab api projects/:id --jq '.default_branch'
+```
+
+## Step 5: Build the PR/MR title and description
+
+Gather the commits on this branch that aren't on the base branch:
+
+```bash
+git log <default-branch>..HEAD --oneline
+```
+
+- **Title**: If there's a single commit, use its subject line. If multiple, summarize the overall change (keep under 72 chars).
+- **Description**: List the commits as bullet points. Add context from $ARGUMENTS if provided.
+
+## Step 6: Create the PR/MR
+
+**GitHub:**
+```bash
+gh pr create --base <default-branch> --title "<title>" --body "<description>"
+```
+
+**GitLab:**
+```bash
+glab mr create --target-branch <default-branch> --title "<title>" --description "<description>"
+```
+
+## Step 7: Output the result
+
+```
+PR/MR SUMMARY
+=============
+Platform: GitHub / GitLab
+URL: https://...
+Title: feat(auth): add OAuth2 token refresh
+Base: main ← feat/add-oauth-refresh
+Status: Created ✓  (or: Already exists)
+```

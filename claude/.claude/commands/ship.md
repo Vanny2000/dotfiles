@@ -1,12 +1,12 @@
 ---
 allowed-tools: Bash(git diff:*), Bash(git diff --cached:*), Bash(git status:*), Bash(git add:*), Bash(git commit:*), Bash(git log:*), Bash(git stash:*), Bash(git reset:*), Bash(git branch:*), Bash(git checkout:*), Bash(git switch:*), Bash(git push:*), Bash(git rev-parse:*), Bash(git remote:*)
 argument-hint: [optional: branch name or focus area]
-description: Runs atomic-commit to split changes into logical commits, then pushes to the upstream feature branch (never to main/master/production). Creates a feature branch if currently on a protected branch.
+description: Runs atomic-commit to split changes into logical commits, then pushes to the upstream feature branch (never to main/master/production), and creates a PR/MR if one doesn't exist yet. Creates a feature branch if currently on a protected branch.
 ---
 
-# Atomic Commit & Push
+# Atomic Commit, Push & PR/MR
 
-Split changes into atomic commits, then safely push to an upstream feature branch.
+Split changes into atomic commits, push to an upstream feature branch, and create a PR/MR if one doesn't exist yet.
 
 ## Phase 1: Atomic commits
 
@@ -61,6 +61,12 @@ Remote: origin
 Commits pushed: 3
 Protected branch check: ✓ passed
 ```
+
+## Phase 3: Create PR/MR
+
+Run `/pr` with any provided $ARGUMENTS to create a pull request or merge request if one doesn't already exist.
+
+---
 
 ## Safety rules (non-negotiable)
 
