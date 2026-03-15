@@ -1,0 +1,185 @@
+#!/usr/bin/env zsh
+
+# =============================================================================
+# claude-worktree-clean
+#
+# Cleans up worktrees created by claude-worktree.
+# Stops DDEV containers, closes tmux windows, removes worktree directories,
+# and optionally deletes the branch.
+#
+# Usage:
+#   cwc <branch>          # clean up a specific worktree
+#   cwc --all             # clean up ALL worktrees for this repo
+#   cwc --list            # list active worktrees
+#
+# Options:
+#   --delete-branch       also delete the local branch after cleanup
+#
+# Examples:
+#   cwc feat/auth
+#   cwc feat/auth --delete-branch
+#   cwc --all
+#   cwc --all --delete-branch
+#   cwc --list
+# =============================================================================
+
+set -e
+
+# --- Resolve repo paths ---
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ -z "$REPO_ROOT" ]]; then
+  echo "Error: not inside a git repository"
+  exit 1
+fi
+
+REPO_NAME=$(basename "$REPO_ROOT")
+
+# --- Parse arguments ---
+BRANCHES=()
+DELETE_BRANCH=false
+LIST_ONLY=false
+CLEAN_ALL=false
+
+for arg in "$@"; do
+  case "$arg" in
+    --delete-branch) DELETE_BRANCH=true ;;
+    --all)           CLEAN_ALL=true ;;
+    --list)          LIST_ONLY=true ;;
+    -*)              echo "Unknown option: $arg"; exit 1 ;;
+    *)               BRANCHES+=("$arg") ;;
+  esac
+done
+
+# --- Determine tmux session ---
+if [[ -n "$TMUX" ]]; then
+  SESSION_NAME=$(tmux display-message -p '#S')
+else
+  SESSION_NAME="${REPO_NAME}"
+fi
+
+# --- List active worktrees ---
+# Parses `git worktree list` to find worktrees that are siblings of the repo
+# and were created by claude-worktree (matching the <repo>-<branch> pattern).
+list_worktrees() {
+  local found=false
+  git worktree list --porcelain | while read -r line; do
+    if [[ "$line" == worktree\ * ]]; then
+      local wt_path="${line#worktree }"
+      local wt_dir=$(basename "$wt_path")
+      # Only show worktrees created by claude-worktree (prefixed with repo name)
+      if [[ "$wt_dir" == "${REPO_NAME}-"* ]]; then
+        local slug="${wt_dir#${REPO_NAME}-}"
+        found=true
+        # Check if DDEV is running for this worktree
+        local ddev_status=""
+        if [[ -d "${wt_path}/.ddev" ]]; then
+          if ddev describe -j "$wt_dir" &>/dev/null; then
+            ddev_status=" [ddev: running]"
+          else
+            ddev_status=" [ddev: stopped]"
+          fi
+        fi
+        echo "  ${slug}  →  ${wt_path}${ddev_status}"
+      fi
+    fi
+  done
+}
+
+if [[ "$LIST_ONLY" == true ]]; then
+  echo "Active worktrees for ${REPO_NAME}:"
+  echo ""
+  list_worktrees
+  exit 0
+fi
+
+# --- Collect branches to clean ---
+if [[ "$CLEAN_ALL" == true ]]; then
+  # Find all worktree branches by parsing git worktree list
+  git worktree list --porcelain | while read -r line; do
+    if [[ "$line" == worktree\ * ]]; then
+      local wt_path="${line#worktree }"
+      local wt_dir=$(basename "$wt_path")
+      if [[ "$wt_dir" == "${REPO_NAME}-"* ]]; then
+        BRANCHES+=("${wt_dir#${REPO_NAME}-}")
+      fi
+    fi
+  done
+elif [[ ${#BRANCHES[@]} -eq 0 ]]; then
+  echo "Usage: cwc <branch> [--delete-branch]"
+  echo "       cwc --all [--delete-branch]"
+  echo "       cwc --list"
+  echo ""
+  echo "Active worktrees:"
+  list_worktrees
+  exit 1
+fi
+
+if [[ ${#BRANCHES[@]} -eq 0 ]]; then
+  echo "No worktrees found to clean up."
+  exit 0
+fi
+
+# --- Clean up a single worktree ---
+cleanup_worktree() {
+  local branch_slug="$1"
+  local worktree_path="${REPO_ROOT}/../${REPO_NAME}-${branch_slug}"
+  local window_name="${branch_slug}"
+
+  echo ""
+  echo "━━━ Cleaning up: ${branch_slug} ━━━"
+
+  # 1. Stop DDEV if running
+  if [[ -d "${worktree_path}/.ddev" ]]; then
+    echo "  🐳 Stopping DDEV..."
+    (cd "$worktree_path" && ddev stop --remove-data --omit-snapshot 2>/dev/null) \
+      || echo "  ⚠ DDEV stop failed (may already be stopped)"
+  fi
+
+  # 2. Close tmux window
+  if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    if tmux list-windows -t "$SESSION_NAME" -F '#{window_name}' | grep -qx "$window_name"; then
+      tmux kill-window -t "${SESSION_NAME}:${window_name}"
+      echo "  ✓ Closed tmux window: ${window_name}"
+    fi
+  fi
+
+  # 3. Remove git worktree
+  if [[ -d "$worktree_path" ]]; then
+    git worktree remove --force "$worktree_path" 2>/dev/null \
+      || rm -rf "$worktree_path"
+    echo "  ✓ Removed worktree: ${worktree_path}"
+  else
+    # Clean up stale worktree reference even if directory is gone
+    git worktree prune 2>/dev/null
+  fi
+
+  # 4. Optionally delete the branch
+  if [[ "$DELETE_BRANCH" == true ]]; then
+    # Convert slug back to branch name (feat-auth → feat/auth)
+    # Try common patterns: if the slug branch exists use it, otherwise try with /
+    local branch_name="${branch_slug}"
+    if ! git show-ref --verify --quiet "refs/heads/${branch_name}"; then
+      # Try converting first hyphen-separated segment as a prefix (feat-auth → feat/auth)
+      branch_name="${branch_slug/-/\/}"
+    fi
+    if git show-ref --verify --quiet "refs/heads/${branch_name}"; then
+      git branch -D "$branch_name" 2>/dev/null
+      echo "  ✓ Deleted branch: ${branch_name}"
+    fi
+  fi
+
+  echo "  ✓ Done"
+}
+
+# --- Run cleanup ---
+for branch in "${BRANCHES[@]}"; do
+  # Accept both "feat/auth" and "feat-auth" formats
+  slug="${branch//\//-}"
+  cleanup_worktree "$slug"
+done
+
+# Prune any stale worktree references
+git worktree prune 2>/dev/null
+
+echo ""
+echo "✓ Cleanup complete"
