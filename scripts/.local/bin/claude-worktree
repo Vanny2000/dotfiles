@@ -8,16 +8,19 @@
 # terminal via leader+tt keymap.
 #
 # On first creation, the worktree project is automatically set up by
-# setup-worktree-project.sh (installs deps, copies .env, runs migrations, etc).
+# setup-worktree-project (installs deps, copies .env, runs migrations, etc).
 #
-# Worktrees are created as direct siblings of the main repo so that Herd
-# auto-serves each one without any manual linking:
+# Supports both DDEV (Docker) and Herd (native) environments.
+# Worktrees are created as direct siblings of the main repo:
 #
-#   Herd/
-#   ├── backend-v3-local/                    # main repo  → backend-v3-local.test
-#   ├── backend-v3-local-feat-auth/          # worktree   → backend-v3-local-feat-auth.test
-#   ├── backend-v3-local-feat-dashboard/     # worktree   → backend-v3-local-feat-dashboard.test
-#   ├── backend-v3-local-fix-n-plus-1/       # worktree   → backend-v3-local-fix-n-plus-1.test
+#   Projects/
+#   ├── backend-v3-local/                    # main repo
+#   ├── backend-v3-local-feat-auth/          # worktree
+#   ├── backend-v3-local-feat-dashboard/     # worktree
+#   ├── backend-v3-local-fix-n-plus-1/       # worktree
+#
+# With Herd:  each sibling auto-serves as <name>.test
+# With DDEV:  each gets its own container at <name>.ddev.site
 #
 # Usage:
 #   cw <branch-name> ["optional prompt"]
@@ -88,9 +91,8 @@ REPO_NAME=$(basename "$REPO_ROOT")
 # Sanitize branch name for filesystem + tmux (feat/auth → feat-auth)
 BRANCH_SLUG="${BRANCH//\//-}"
 
-# Worktrees are direct siblings of the main repo so Herd auto-serves them.
-# e.g. Herd/myapp/ → Herd/myapp-feat-auth/
-# This means each worktree gets its own .test domain automatically.
+# Worktrees are direct siblings of the main repo.
+# e.g. Projects/myapp/ → Projects/myapp-feat-auth/
 WORKTREE_PATH="${REPO_ROOT}/../${REPO_NAME}-${BRANCH_SLUG}"
 
 # --- Determine tmux session ---
@@ -185,13 +187,21 @@ fi
 
 # --- Summary ---
 # Show the user everything they need to know to find and review this worktree
-HERD_URL="${REPO_NAME}-${BRANCH_SLUG}.test"
+WORKTREE_DIR_NAME=$(basename "$(cd "$WORKTREE_PATH" 2>/dev/null && pwd || echo "$WORKTREE_PATH")")
+
+# Detect environment for URL display
+if [[ -d "${WORKTREE_PATH}/.ddev" ]] || [[ -d "${REPO_ROOT}/.ddev" ]]; then
+  PROJECT_URL="https://${WORKTREE_DIR_NAME}.ddev.site"
+else
+  PROJECT_URL="http://${WORKTREE_DIR_NAME}.test"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Branch:  $BRANCH"
 echo "  Tree:    $WORKTREE_PATH"
 echo "  Window:  ${SESSION_NAME}:${WINDOW_NAME}"
-echo "  Herd:    http://${HERD_URL}"
+echo "  URL:     ${PROJECT_URL}"
 if [[ -z "$TMUX" ]]; then
   echo "  Attach:  tmux attach -t ${SESSION_NAME}"
 fi
