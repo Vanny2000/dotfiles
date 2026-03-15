@@ -4,6 +4,7 @@
 # setup-worktree-project
 #
 # Sets up a Laravel worktree with dependencies, env config, and caches.
+# Supports both DDEV (Docker) and Herd (native) environments.
 #
 # Called automatically by claude-worktree after creating a new worktree,
 # or can be run standalone in any project directory.
@@ -36,6 +37,16 @@ if [[ ! -f "artisan" ]]; then
 fi
 
 # =============================================================================
+# Detect environment: DDEV or Herd (native)
+# =============================================================================
+USE_DDEV=false
+if [[ -d ".ddev" ]]; then
+  USE_DDEV=true
+elif [[ -n "$MAIN_REPO_PATH" && -d "${MAIN_REPO_PATH}/.ddev" ]]; then
+  USE_DDEV=true
+fi
+
+# =============================================================================
 # Helpers
 # =============================================================================
 symlink_from_main() {
@@ -56,16 +67,92 @@ copy_from_main() {
   fi
 }
 
+# Run a command either via ddev or natively depending on environment
+run_cmd() {
+  if [[ "$USE_DDEV" == true ]]; then
+    ddev exec "$@"
+  else
+    "$@"
+  fi
+}
+
+# =============================================================================
+# DDEV setup (copy config, set unique project name, start containers)
+# =============================================================================
+if [[ "$USE_DDEV" == true ]]; then
+  # Extract the main project's DDEV name for DB container reference.
+  # The main repo's db container is accessible at ddev-<name>-db on the
+  # shared ddev_default Docker network.
+  MAIN_DDEV_NAME=""
+  if [[ -n "$MAIN_REPO_PATH" && -f "${MAIN_REPO_PATH}/.ddev/config.yaml" ]]; then
+    MAIN_DDEV_NAME=$(grep '^name:' "${MAIN_REPO_PATH}/.ddev/config.yaml" | head -1 | sed 's/^name:[[:space:]]*//')
+  fi
+
+  # Copy .ddev/ config from main repo if not already present
+  if [[ -n "$MAIN_REPO_PATH" && -d "${MAIN_REPO_PATH}/.ddev" && ! -d "${WORKTREE_PATH}/.ddev" ]]; then
+    cp -r "${MAIN_REPO_PATH}/.ddev" "${WORKTREE_PATH}/.ddev"
+    echo "  ✓ Copied .ddev config from main repo"
+  fi
+
+  # Set a unique DDEV project name based on the worktree directory name.
+  # Each DDEV project needs a unique name to avoid port/container conflicts.
+  WORKTREE_DIR_NAME=$(basename "$WORKTREE_PATH")
+  if [[ -f ".ddev/config.yaml" ]]; then
+    sed -i '' "s/^name:.*/name: ${WORKTREE_DIR_NAME}/" .ddev/config.yaml
+    echo "  ✓ DDEV project name set to: ${WORKTREE_DIR_NAME}"
+  fi
+
+  # Omit the db container — worktrees share the main repo's database.
+  # All DDEV projects share the ddev_default network, so the worktree's
+  # web container can reach the main db at ddev-<main-name>-db:3306.
+  if [[ -f ".ddev/config.yaml" ]]; then
+    if ! grep -q '^omit_containers:' .ddev/config.yaml; then
+      echo 'omit_containers: [db]' >> .ddev/config.yaml
+    else
+      sed -i '' 's/^omit_containers:.*/omit_containers: [db]/' .ddev/config.yaml
+    fi
+    echo "  ✓ DB container omitted (using main repo's database)"
+  fi
+
+  # Copy .env BEFORE ddev start — otherwise DDEV generates a default .env
+  # and copy_from_main skips because the file already exists.
+  copy_from_main ".env"
+
+  # Point DB_HOST at the main repo's database container.
+  if [[ -n "$MAIN_DDEV_NAME" && -f ".env" ]]; then
+    sed -i '' "s/^DB_HOST=.*/DB_HOST=ddev-${MAIN_DDEV_NAME}-db/" .env
+    echo "  ✓ DB_HOST set to ddev-${MAIN_DDEV_NAME}-db"
+  fi
+
+  # Start DDEV containers (web only, no db)
+  echo "🐳 Starting DDEV..."
+  ddev start
+fi
+
 # =============================================================================
 # Config files from main repo
 # =============================================================================
-symlink_from_main ".env"
+if [[ "$USE_DDEV" != true ]]; then
+  # Herd: symlink is fine since all projects share the same DB
+  symlink_from_main ".env"
+fi
 
 # =============================================================================
 # Composer dependencies
 # =============================================================================
 echo "📦 Running composer install..."
-composer install --no-interaction --quiet 2>/dev/null || composer install --no-interaction
+if [[ "$USE_DDEV" == true ]]; then
+  # Don't copy composer.lock for DDEV — the main repo's lock file was likely
+  # generated under a different PHP version (e.g. Herd's PHP 8.1/8.2) and
+  # won't be compatible with the DDEV container's PHP.
+  # Use --no-security-blocking so advisories don't prevent installation.
+  ddev composer install --no-security-blocking --no-interaction --quiet 2>/dev/null \
+    || ddev composer install --no-security-blocking --no-interaction
+else
+  # Herd: copy composer.lock so `composer install` uses locked versions
+  copy_from_main "composer.lock"
+  composer install --no-interaction --quiet 2>/dev/null || composer install --no-interaction
+fi
 
 # =============================================================================
 # Laravel setup
@@ -74,18 +161,19 @@ composer install --no-interaction --quiet 2>/dev/null || composer install --no-i
 # Generate app key if .env exists but APP_KEY is empty
 if [[ -f ".env" ]] && grep -q "^APP_KEY=$" .env; then
   echo "🔑 Generating Laravel app key..."
-  php artisan key:generate --quiet
+  run_cmd php artisan key:generate --quiet
 fi
 
-# Run migrations if we have a database configured
-if [[ -f ".env" ]]; then
+# Run migrations if we have a database configured.
+# Skip for DDEV worktrees — they share the main repo's DB which is already migrated.
+if [[ -f ".env" && "$USE_DDEV" != true ]]; then
   echo "🗃️  Running Laravel migrations..."
-  php artisan migrate --quiet --no-interaction 2>/dev/null || echo "  ⚠ Migrations skipped (DB not available)"
+  run_cmd php artisan migrate --quiet --no-interaction 2>/dev/null || echo "  ⚠ Migrations skipped (DB not available)"
 fi
 
 # Clear and rebuild caches for a clean state
 echo "🧹 Clearing Laravel caches..."
-php artisan optimize:clear --quiet 2>/dev/null
+run_cmd php artisan optimize:clear --quiet 2>/dev/null
 
 # =============================================================================
 # Node dependencies (for frontend assets if present)
@@ -102,8 +190,15 @@ if [[ -f "package.json" ]]; then
   fi
 
   echo "📦 Running ${PM} install..."
-  $PM install --silent 2>/dev/null || $PM install
+  if [[ "$USE_DDEV" == true ]]; then
+    ddev exec $PM install --silent 2>/dev/null || ddev exec $PM install
+  else
+    $PM install --silent 2>/dev/null || $PM install
+  fi
 fi
 
 echo ""
 echo "✓ Laravel worktree setup complete"
+if [[ "$USE_DDEV" == true ]]; then
+  echo "  URL: https://${WORKTREE_DIR_NAME}.ddev.site"
+fi
