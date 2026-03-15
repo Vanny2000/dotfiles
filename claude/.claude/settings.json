@@ -23,7 +23,7 @@
       }
     }
   },
+  "effortLevel": "high",
   "voiceEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "skipDangerousModePermissionPrompt": true
 }
