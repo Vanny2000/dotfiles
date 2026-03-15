@@ -131,7 +131,7 @@ cleanup_worktree() {
   # 1. Stop DDEV if running
   if [[ -d "${worktree_path}/.ddev" ]]; then
     echo "  🐳 Stopping DDEV..."
-    (cd "$worktree_path" && ddev delete --omit-snapshot 2>/dev/null) \
+    (cd "$worktree_path" && ddev delete --omit-snapshot -y 2>/dev/null) \
       || echo "  ⚠ DDEV delete failed (may already be deleted)"
   fi
 
