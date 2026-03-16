@@ -58,7 +58,7 @@ inner.vertical =   8
 outer.left =       16
 outer.right =      16
 outer.bottom =     8
-outer.top =        10
+outer.top = [{monitor.main = 10 }, {monitor."LF27T35" = 35 }, 10]
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
