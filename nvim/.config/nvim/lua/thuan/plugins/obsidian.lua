@@ -32,7 +32,7 @@ return {
 		workspaces = {
 			{
 				name = "notes",
-				path = "~/Obsidian/The Brain",
+				path = "~/notes/The Brain",
 			},
 		},
 		-- Optional, for templates (see below).
