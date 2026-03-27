@@ -7,6 +7,7 @@ return {
 	opts = {
 		bigfile = {
 			enable = true,
+      size = 1024 * 200 -- 200 KB
 		},
 		image = {
 			enable = true,

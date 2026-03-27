@@ -97,6 +97,7 @@ COMMITS CREATED
 
 - **Never mix** a bug fix with a refactor in the same commit, even if they touch the same file
 - **Never mix** dependency updates with feature code
+- **NEVER** include the Co-Author.
 - **Skip** committing generated files (e.g., `dist/`, `*.lock`) unless they are the *only* change in a logical unit
 - If $ARGUMENTS is provided, treat it as a scope hint or focus area (e.g., "only commit auth-related changes", "scope: payments module")
 - If you are unsure whether two changes belong together, **split them** — atomic is better than bundled
