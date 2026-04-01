@@ -126,3 +126,6 @@ export PATH="$PATH:$HOME/.local/bin"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Rust
+export PATH="$HOME/.cargo/bin:$PATH"
