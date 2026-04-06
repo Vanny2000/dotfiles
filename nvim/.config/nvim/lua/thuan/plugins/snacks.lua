@@ -88,6 +88,14 @@ return {
 			end,
 			desc = "Lazygit",
 		},
+		-- Lazyjira
+		{
+			"<leader>lj",
+			function()
+				Snacks.terminal("lazyjira", { cwd = Snacks.git.get_root() })
+			end,
+			desc = "Lazyjira",
+		},
 		-- File Explorer
 		{
 			"<leader>ee",
