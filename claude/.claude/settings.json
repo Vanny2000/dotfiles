@@ -1,7 +1,8 @@
 {
   "env": {
     "ENABLE_TOOL_SEARCH": "auto:5",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "KENER_URL": "https://status.shoprunback.com"
   },
   "statusLine": {
     "type": "command",
