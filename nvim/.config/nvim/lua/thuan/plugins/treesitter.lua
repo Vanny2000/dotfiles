@@ -32,6 +32,7 @@ return {
 				"vue",
 				"go",
 				"blade",
+				"astro",
 			}
 
 			-- Only install parsers that are missing (avoids reinstall on every startup)
@@ -76,6 +77,7 @@ return {
 				"vue",
 				"go",
 				"blade",
+				"astro",
 			}
 
 			vim.api.nvim_create_autocmd("FileType", {

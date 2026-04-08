@@ -17,6 +17,7 @@ return {
 				"eslint",
 				"intelephense",
 				"gopls",
+				"astro",
 			},
 		},
 		dependencies = {
