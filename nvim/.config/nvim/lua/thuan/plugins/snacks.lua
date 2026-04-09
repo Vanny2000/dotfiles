@@ -22,9 +22,6 @@ return {
 		indent = {
 			enable = true,
 		},
-		lazygit = {
-			enable = true,
-		},
 		-- dim = {},
 		picker = {
 			enable = true,
@@ -84,7 +81,7 @@ return {
 		{
 			"<leader>lg",
 			function()
-				Snacks.lazygit()
+				Snacks.terminal("lazygit", { cwd = Snacks.git.get_root() })
 			end,
 			desc = "Lazygit",
 		},
@@ -95,6 +92,13 @@ return {
 				Snacks.terminal("lazyjira", { cwd = Snacks.git.get_root() })
 			end,
 			desc = "Lazyjira",
+		},
+    {
+			"<leader>ld",
+			function()
+				Snacks.terminal("lazydocker")
+			end,
+			desc = "Lazydocker",
 		},
 		-- File Explorer
 		{
