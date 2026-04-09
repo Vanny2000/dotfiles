@@ -7,5 +7,5 @@ sketchybar --add item media left \
                        icon=􀑪             \
                        icon.color=$ACCENT_COLOR   \
                        background.drawing=off \
-                       script="$PLUGIN_DIR/media.sh" \
-           --subscribe media media_change
+                       update_freq=2 \
+                       script="$PLUGIN_DIR/media.sh"
