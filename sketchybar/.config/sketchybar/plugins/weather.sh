@@ -1,48 +1,95 @@
 #!/usr/bin/env bash
 
-# Fetch IP and location
-IP=$(curl -s https://ipinfo.io/ip)
-LOCATION=$(curl -s https://ipinfo.io/"$IP"/json | jq '.ip' | tr -d '"')
+# Fetch IP and location (lat,long) from ipinfo.io
+IPINFO_JSON=$(curl -s "https://ipinfo.io/json")
+LOC=$(echo "$IPINFO_JSON" | jq -r '.loc')
+CITY=$(echo "$IPINFO_JSON" | jq -r '.city')
+LAT="${LOC%,*}"
+LON="${LOC#*,}"
 
-# Fetch weather data in JSON format
-WEATHER_JSON=$(curl -s "https://wttr.in/$LOCATION?format=j1")
-
-# Fallback if weather data is empty
-if [ -z "$WEATHER_JSON" ]; then
+# Fallback if location lookup failed
+if [ -z "$LOC" ] || [ "$LOC" = "null" ]; then
   sketchybar --set "$NAME" label="UNKNOWN LOCATION"
   exit 1
 fi
 
-# Parse weather data
-CITY="$(echo "$WEATHER_JSON" | jq '.nearest_area[0].areaName[].value' | tr -d '"')"
-REGION="$(echo "$WEATHER_JSON" | jq '.nearest_area[0].region[].value' | tr -d '"')"
-TEMPERATURE=$(echo "$WEATHER_JSON" | jq '.current_condition[0].temp_C' | tr -d '"')
-WEATHER_DESCRIPTION=$(echo "$WEATHER_JSON" | jq '.current_condition[0].weatherDesc[0].value' | tr -d '"' | sed 's/\(.\{25\}\).*/\1.../')
+# Fetch weather data from Open-Meteo
+WEATHER_JSON=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code")
 
-# Map weather conditions to icons
-case "$WEATHER_DESCRIPTION" in
-  *sunny* | *clear*)
+# Fallback if weather data is empty
+if [ -z "$WEATHER_JSON" ] || [ "$(echo "$WEATHER_JSON" | jq -r '.current')" = "null" ]; then
+  sketchybar --set "$NAME" label="WEATHER UNAVAILABLE"
+  exit 1
+fi
+
+# Parse weather data
+TEMPERATURE=$(echo "$WEATHER_JSON" | jq -r '.current.temperature_2m')
+WEATHER_CODE=$(echo "$WEATHER_JSON" | jq -r '.current.weather_code')
+
+# Map WMO weather codes to description and icon
+# https://open-meteo.com/en/docs#weather_variable_documentation
+case "$WEATHER_CODE" in
+  0)
+    WEATHER_DESCRIPTION="Clear"
     ICON="􀇔"  # Sun icon
     ;;
-  *cloudy* | *overcast*)
+  1)
+    WEATHER_DESCRIPTION="Mainly clear"
+    ICON="􀇔"  # Sun icon
+    ;;
+  2)
+    WEATHER_DESCRIPTION="Partly cloudy"
     ICON="􀇂"  # Cloud icon
     ;;
-  *rain* | *drizzle* | *showers*)
-    ICON="􀇄"  # Rain icon
+  3)
+    WEATHER_DESCRIPTION="Overcast"
+    ICON="􀇂"  # Cloud icon
     ;;
-  *thunderstorm*)
-    ICON="􀇒"  # Thunderstorm icon
-    ;;
-  *snow*)
-    ICON="􀇎"  # Snowflake icon
-    ;;
-  *fog* | *mist*)
+  45 | 48)
+    WEATHER_DESCRIPTION="Fog"
     ICON="􀇊"  # Fog icon
     ;;
+  51 | 53 | 55)
+    WEATHER_DESCRIPTION="Drizzle"
+    ICON="􀇄"  # Rain icon
+    ;;
+  56 | 57)
+    WEATHER_DESCRIPTION="Freezing drizzle"
+    ICON="􀇄"  # Rain icon
+    ;;
+  61 | 63 | 65)
+    WEATHER_DESCRIPTION="Rain"
+    ICON="􀇄"  # Rain icon
+    ;;
+  66 | 67)
+    WEATHER_DESCRIPTION="Freezing rain"
+    ICON="􀇄"  # Rain icon
+    ;;
+  71 | 73 | 75 | 77)
+    WEATHER_DESCRIPTION="Snow"
+    ICON="􀇎"  # Snowflake icon
+    ;;
+  80 | 81 | 82)
+    WEATHER_DESCRIPTION="Rain showers"
+    ICON="􀇄"  # Rain icon
+    ;;
+  85 | 86)
+    WEATHER_DESCRIPTION="Snow showers"
+    ICON="􀇎"  # Snowflake icon
+    ;;
+  95)
+    WEATHER_DESCRIPTION="Thunderstorm"
+    ICON="􀇒"  # Thunderstorm icon
+    ;;
+  96 | 99)
+    WEATHER_DESCRIPTION="Thunderstorm w/ hail"
+    ICON="􀇒"  # Thunderstorm icon
+    ;;
   *)
+    WEATHER_DESCRIPTION="Unknown"
     ICON="􂬮"  # Default icon (question mark)
     ;;
 esac
 
 # Update SketchyBar with weather information and icon
-sketchybar --set "$NAME" label="${TEMPERATURE}°C • $WEATHER_DESCRIPTION" icon="$ICON" 
+sketchybar --set "$NAME" label="${TEMPERATURE}°C • $WEATHER_DESCRIPTION" icon="$ICON"
