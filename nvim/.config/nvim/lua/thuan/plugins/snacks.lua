@@ -81,7 +81,7 @@ return {
 		{
 			"<leader>lg",
 			function()
-				Snacks.terminal("lazygit", { cwd = Snacks.git.get_root() })
+				Snacks.lazygit()
 			end,
 			desc = "Lazygit",
 		},
