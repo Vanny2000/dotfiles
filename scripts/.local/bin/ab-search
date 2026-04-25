@@ -1,0 +1,31 @@
+#!/bin/bash
+# ab-search FILE QUERY
+# Outputs matching entries as: email<TAB>name (aerc's expected format)
+
+file="$1"
+query="$2"
+
+[ -z "$file" ] && { echo "usage: ab-search FILE QUERY" >&2; exit 1; }
+[ ! -f "$file" ] && exit 0
+[ -z "$query" ] && exit 0
+
+# Search whole line case-insensitively, then for each match extract the
+# value side (after " : " if present), then split "Name <email>" into TSV.
+grep -i -- "$query" "$file" | while IFS= read -r line; do
+    # Strip "alias : " prefix if present
+    value="${line#*: }"
+    [ "$value" = "$line" ] && value="$line"   # no " : ", whole line is the value
+
+    # Parse "Display Name <email@x.com>" or bare "<email@x.com>" or "email@x.com"
+    if [[ "$value" =~ ^(.*)[[:space:]]*\<([^\>]+)\>[[:space:]]*$ ]]; then
+        name="${BASH_REMATCH[1]}"
+        email="${BASH_REMATCH[2]}"
+        # Trim trailing whitespace and surrounding quotes from name
+        name="${name%"${name##*[![:space:]]}"}"
+        name="${name#\"}"; name="${name%\"}"
+        printf '%s\t%s\n' "$email" "$name"
+    else
+        # Bare email address
+        printf '%s\t\n' "$value"
+    fi
+done

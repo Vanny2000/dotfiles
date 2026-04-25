@@ -1,0 +1,75 @@
+#!/bin/bash
+# ab-add FILE [--all|--from|--to|--cc|--bcc]
+
+file="$1"
+mode="${2:---all}"
+
+[ -z "$file" ] && { echo "usage: ab-add FILE [--all|--from|--to|--cc|--bcc]" >&2; exit 1; }
+[ ! -f "$file" ] && { mkdir -p "$(dirname "$file")"; touch "$file"; echo "Created $file" >&2; }
+
+case "$mode" in
+    --all)  headers="From|To|Cc|CC|Bcc" ;;
+    --from) headers="From" ;;
+    --to)   headers="To" ;;
+    --cc)   headers="Cc|CC" ;;
+    --bcc)  headers="Bcc" ;;
+    *) echo "unknown mode: $mode" >&2; exit 1 ;;
+esac
+
+# Use Perl for the heavy lifting: it handles header unfolding, MIME decoding,
+# and comma-splitting-that-respects-quotes in one pass. Outputs one address per line.
+perl -CS -MEncode -e '
+    use strict; use warnings;
+    my $headers_re = shift;
+    local $/;
+    my $msg = <STDIN>;
+
+    # Cut off body: everything up to first blank line
+    $msg =~ s/\r?\n\r?\n.*//s;
+
+    # Unfold headers: a line starting with whitespace continues the previous line
+    $msg =~ s/\r?\n[ \t]+/ /g;
+
+    for my $line (split /\r?\n/, $msg) {
+        next unless $line =~ /^($headers_re):\s*(.*)$/i;
+        my $value = $2;
+        # Decode MIME encoded-words
+        $value = decode("MIME-Header", $value);
+        # Split on commas that are NOT inside double quotes
+        my @parts;
+        my $depth_q = 0; my $buf = "";
+        for my $c (split //, $value) {
+            if ($c eq q{"}) { $depth_q = !$depth_q; $buf .= $c; }
+            elsif ($c eq "," && !$depth_q) { push @parts, $buf; $buf = ""; }
+            else { $buf .= $c; }
+        }
+        push @parts, $buf if length $buf;
+        for my $p (@parts) {
+            $p =~ s/^\s+|\s+$//g;
+            next unless length $p;
+            print $p, "\n";
+        }
+    }
+' "$headers" \
+  | while IFS= read -r entry; do
+        case "$entry" in
+            *@*) ;;
+            *) continue ;;
+        esac
+        echo "$entry" | grep -iqE 'no[_-]?reply' && continue
+        # Squeeze multiple spaces
+        entry=$(echo "$entry" | tr -s ' ')
+        # Wrap bare email in angle brackets
+        case "$entry" in
+            *\<*\>*) ;;
+            *) entry="<$entry>" ;;
+        esac
+        # Dedupe
+        if grep -Fxq "$entry" "$file" 2>/dev/null \
+           || grep -Fq ": $entry" "$file" 2>/dev/null; then
+            echo "! $entry (skipped)" >&2
+            continue
+        fi
+        echo "+ $entry" >&2
+        echo "$entry" >> "$file"
+    done
