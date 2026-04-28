@@ -1,17 +1,16 @@
 #!/bin/bash
-# ab-search FILE QUERY
+# ab-search PASS_PATH QUERY
 # Outputs matching entries as: email<TAB>name (aerc's expected format)
 
-file="$1"
+pass_path="$1"
 query="$2"
 
-[ -z "$file" ] && { echo "usage: ab-search FILE QUERY" >&2; exit 1; }
-[ ! -f "$file" ] && exit 0
+[ -z "$pass_path" ] && { echo "usage: ab-search PASS_PATH QUERY" >&2; exit 1; }
 [ -z "$query" ] && exit 0
 
 # Search whole line case-insensitively, then for each match extract the
 # value side (after " : " if present), then split "Name <email>" into TSV.
-grep -i -- "$query" "$file" | while IFS= read -r line; do
+pass show "$pass_path" 2>/dev/null | grep -i -- "$query" | while IFS= read -r line; do
     # Strip "alias : " prefix if present
     value="${line#*: }"
     [ "$value" = "$line" ] && value="$line"   # no " : ", whole line is the value
