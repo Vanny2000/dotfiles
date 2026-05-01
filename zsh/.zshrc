@@ -48,7 +48,7 @@ alias air="~/go/bin/air"
 alias ls="eza --icons=auto"
 alias cd="z"
 alias ts="tailscale"
-alias bt="Budget_Tracker"
+alias hl="hledger"
 alias cc="claude --dangerously-skip-permissions"
 alias cw="claude-worktree"
 alias cwc="claude-worktree-clean"
@@ -129,3 +129,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Rust
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# hledger
+export LEDGER_FILE="$HOME/finance/2026.journal"
