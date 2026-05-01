@@ -1,0 +1,12 @@
+encryption:
+  tag: GPG
+  contents: 133513A0E6398CE6
+
+
+services:
+  microsoft:
+    client_id: 5a8ff0e9-1855-494a-aa8b-1c1fe16e056b
+    auth_scope: https://outlook.office365.com/IMAP.AccessAsUser.All
+      https://outlook.office365.com/SMTP.Send
+      offline_access
+    tenant: 82ec5cb0-346a-4239-9208-2dd099ae83c8
