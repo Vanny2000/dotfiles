@@ -14,7 +14,6 @@ Run `git status` and `git diff HEAD` (or `git diff` + `git diff --cached` if som
 
 Also run `git log --oneline -5` to understand the recent commit style and conventions used in this project.
 
-Also, if a laravel project is detected, use laravel-simplifer:laravel-simplifer if exists to review/change the code to be laravel's standard before continuing to the next step.
 
 ## Step 2: Analyze and group changes
 
