@@ -131,4 +131,4 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # hledger
-export LEDGER_FILE="$HOME/finance/2026.journal"
+export LEDGER_FILE="$HOME/finance/main.journal"
