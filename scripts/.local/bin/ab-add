@@ -1,11 +1,12 @@
 #!/bin/bash
-# ab-add FILE [--all|--from|--to|--cc|--bcc]
+# ab-add PASS_PATH [--all|--from|--to|--cc|--bcc]
+# Reads an email message from stdin, extracts addresses from the chosen
+# headers, and appends new ones to the pass store entry at PASS_PATH.
 
-file="$1"
+pass_path="$1"
 mode="${2:---all}"
 
-[ -z "$file" ] && { echo "usage: ab-add FILE [--all|--from|--to|--cc|--bcc]" >&2; exit 1; }
-[ ! -f "$file" ] && { mkdir -p "$(dirname "$file")"; touch "$file"; echo "Created $file" >&2; }
+[ -z "$pass_path" ] && { echo "usage: ab-add PASS_PATH [--all|--from|--to|--cc|--bcc]" >&2; exit 1; }
 
 case "$mode" in
     --all)  headers="From|To|Cc|CC|Bcc" ;;
@@ -16,9 +17,11 @@ case "$mode" in
     *) echo "unknown mode: $mode" >&2; exit 1 ;;
 esac
 
-# Use Perl for the heavy lifting: it handles header unfolding, MIME decoding,
-# and comma-splitting-that-respects-quotes in one pass. Outputs one address per line.
-perl -CS -MEncode -e '
+# Load existing entry (empty string if it doesn't exist yet)
+existing=$(pass show "$pass_path" 2>/dev/null || true)
+
+# Extract candidate addresses from the message on stdin
+candidates=$(perl -CS -MEncode -e '
     use strict; use warnings;
     my $headers_re = shift;
     local $/;
@@ -50,26 +53,43 @@ perl -CS -MEncode -e '
             print $p, "\n";
         }
     }
-' "$headers" \
-  | while IFS= read -r entry; do
-        case "$entry" in
-            *@*) ;;
-            *) continue ;;
-        esac
-        echo "$entry" | grep -iqE 'no[_-]?reply' && continue
-        # Squeeze multiple spaces
-        entry=$(echo "$entry" | tr -s ' ')
-        # Wrap bare email in angle brackets
-        case "$entry" in
-            *\<*\>*) ;;
-            *) entry="<$entry>" ;;
-        esac
-        # Dedupe
-        if grep -Fxq "$entry" "$file" 2>/dev/null \
-           || grep -Fq ": $entry" "$file" 2>/dev/null; then
-            echo "! $entry (skipped)" >&2
-            continue
-        fi
-        echo "+ $entry" >&2
-        echo "$entry" >> "$file"
-    done
+' "$headers")
+
+# Walk candidates, dedupe against existing + pending, accumulate new lines
+to_append=""
+while IFS= read -r entry; do
+    [ -z "$entry" ] && continue
+    case "$entry" in
+        *@*) ;;
+        *) continue ;;
+    esac
+    echo "$entry" | grep -iqE 'no[_-]?reply' && continue
+    # Squeeze multiple spaces
+    entry=$(echo "$entry" | tr -s ' ')
+    # Wrap bare email in angle brackets
+    case "$entry" in
+        *\<*\>*) ;;
+        *) entry="<$entry>" ;;
+    esac
+    # Dedupe against existing entry content and anything queued this run
+    combined=$(printf '%s\n%s' "$existing" "$to_append")
+    if printf '%s' "$combined" | grep -Fxq "$entry" \
+       || printf '%s' "$combined" | grep -Fq ": $entry"; then
+        echo "! $entry (skipped)" >&2
+        continue
+    fi
+    echo "+ $entry" >&2
+    if [ -z "$to_append" ]; then
+        to_append="$entry"
+    else
+        to_append=$(printf '%s\n%s' "$to_append" "$entry")
+    fi
+done <<< "$candidates"
+
+[ -z "$to_append" ] && exit 0
+
+# Write merged content back to the pass store (force overwrite, multiline)
+{
+    [ -n "$existing" ] && printf '%s\n' "$existing"
+    printf '%s\n' "$to_append"
+} | pass insert -m -f "$pass_path" >/dev/null
