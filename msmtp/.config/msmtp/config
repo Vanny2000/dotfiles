@@ -1,0 +1,27 @@
+# Defaults applied to every account unless overridden
+defaults
+auth           on
+tls            on
+tls_starttls   on
+tls_trust_file /opt/homebrew/etc/openssl@3/cert.pem
+logfile        ~/.msmtp.log
+
+# ===== Shoprunback (Office 365, XOAUTH2 via oama) =====
+account shoprunback
+host           smtp.office365.com
+port           587
+auth           xoauth2
+user           vanny@shoprunback.com
+passwordeval   oama access vanny@shoprunback.com
+from           vanny@shoprunback.com
+
+# ===== Gmail (app password via pass) =====
+account gmail
+host           smtp.gmail.com
+port           587
+user           kongvanny2000@gmail.com
+passwordeval   pass show personal/gmail/kongvanny2000@gmail.com/app_passwords/aerc
+from           kongvanny2000@gmail.com
+
+# Default if no -a given
+account default : shoprunback
