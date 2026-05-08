@@ -52,8 +52,6 @@ alias hl="hledger"
 alias cc="claude --dangerously-skip-permissions"
 alias cw="claude-worktree"
 alias cwc="claude-worktree-clean"
-# Zoxide
-eval "$(zoxide init zsh)"
 
 # Prompt
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -132,3 +130,6 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 # hledger
 export LEDGER_FILE="$HOME/finance/main.journal"
+
+# Zoxide
+eval "$(zoxide init zsh)"
