@@ -1,0 +1,51 @@
+# ===== Shoprunback (Office 365, XOAUTH2 via oama) =====
+IMAPAccount shoprunback
+Host outlook.office365.com
+Port 993
+User vanny@shoprunback.com
+AuthMechs XOAUTH2
+PassCmd "oama access vanny@shoprunback.com"
+TLSType IMAPS
+TLSVersions +1.2 +1.3
+
+IMAPStore shoprunback-remote
+Account shoprunback
+
+MaildirStore shoprunback-local
+Path ~/.mail/shoprunback/
+Inbox ~/.mail/shoprunback/INBOX
+SubFolders Verbatim
+
+Channel shoprunback
+Far :shoprunback-remote:
+Near :shoprunback-local:
+Patterns "INBOX" "Sent Items" "Drafts" "Deleted Items" "Junk Email" "Archive"
+Create Both
+Expunge Both
+SyncState *
+
+# ===== Gmail (app password via pass) =====
+IMAPAccount gmail
+Host imap.gmail.com
+Port 993
+User kongvanny2000@gmail.com
+AuthMechs LOGIN
+PassCmd "pass show personal/gmail/kongvanny2000@gmail.com/app_passwords/aerc"
+TLSType IMAPS
+TLSVersions +1.2 +1.3
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Path ~/.mail/gmail/
+Inbox ~/.mail/gmail/INBOX
+SubFolders Verbatim
+
+Channel gmail
+Far :gmail-remote:
+Near :gmail-local:
+Patterns "INBOX" "[Gmail]/Sent Mail" "[Gmail]/Drafts" "[Gmail]/Bin" "[Gmail]/Spam" "[Gmail]/All Mail"
+Create Both
+Expunge Both
+SyncState *
