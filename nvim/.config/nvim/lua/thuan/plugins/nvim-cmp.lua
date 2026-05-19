@@ -33,6 +33,7 @@ return {
 		require("luasnip").filetype_extend("php", { "phpdoc" })
 		require("luasnip").filetype_extend("php", { "blade" })
 		require("luasnip").filetype_extend("vue", { "html" })
+		require("luasnip").filetype_extend("dart", { "flutter" })
 		cmp.setup({
 			completion = {
 				completeopt = "menu,menuone,preview,noselect",

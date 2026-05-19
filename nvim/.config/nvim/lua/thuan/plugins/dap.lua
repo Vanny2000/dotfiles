@@ -171,6 +171,14 @@ return {
 			dapui.open()
 		end
 
+    dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+    end
+
+    dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+    end
+
 		-- Debugging keymaps
 		local keymap = vim.keymap
 		local opts = { silent = true }

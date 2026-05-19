@@ -33,7 +33,8 @@ return {
 				"go",
 				"blade",
 				"astro",
-        "ledger"
+        "ledger",
+				"dart",
 			}
 
 			-- Only install parsers that are missing (avoids reinstall on every startup)
@@ -80,6 +81,7 @@ return {
 				"blade",
 				"astro",
         "ledger",
+				"dart",
 			}
 
 			vim.api.nvim_create_autocmd("FileType", {

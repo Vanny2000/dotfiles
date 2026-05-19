@@ -11,6 +11,11 @@ return {
 					args = { "format", "$FILENAME" },
 					stdin = false,
 				},
+				dart_format = {
+					command = "dart",
+					args = { "format", "$FILENAME" },
+					stdin = false,
+				},
 			},
 			formatters_by_ft = {
 				javascript = { "prettier" },
@@ -31,6 +36,7 @@ return {
 				blade = { "blade-formatter" }, -- Add blade-formatter blade files
 				go = { "gofmt" },
 				http = { "kulala" },
+				dart = { "dart_format" },
 			},
 		})
 

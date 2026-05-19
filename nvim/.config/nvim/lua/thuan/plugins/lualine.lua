@@ -50,6 +50,27 @@ return {
 						separator = { left = "", right = "" },
             padding = 1,
 					},
+					-- flutter status (device + app version)
+					{
+						function()
+							local d = vim.g.flutter_tools_decorations or {}
+							local parts = {}
+							if d.device then
+								table.insert(parts, d.device.name or d.device.id)
+							end
+							if d.app_version then
+								table.insert(parts, d.app_version)
+							end
+							return " " .. table.concat(parts, " · ")
+						end,
+						cond = function()
+							local d = vim.g.flutter_tools_decorations
+							return d and (d.device or d.app_version) ~= nil
+						end,
+						color = { fg = colors.bg0_hard, bg = colors.blue },
+						separator = { left = "", right = "" },
+						padding = 1,
+					},
 				},
 				lualine_x = {
 					{
