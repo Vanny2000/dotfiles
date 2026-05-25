@@ -40,13 +40,17 @@ return {
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		opts = {
 			ensure_installed = {
-				"prettier", -- prettier formatter
+				"biome", -- js/ts/json formatter + linter
+				"prettier", -- fallback formatter (md/css/html/etc.)
+				"eslint_d", -- js/ts linter daemon
 				"stylua", -- lua formatter
-				"isort", -- python formatter
 				"black", -- python formatter
-				"pylint",
-				"phpcs", -- php formatter
-				"gopls", -- go
+				"ruff", -- python formatter + linter
+				"pylint", -- python linter
+				"pint", -- php/laravel formatter
+				"blade-formatter", -- php/laravel blade formatter
+				"taplo", -- toml formatter
+				"goimports", -- go formatter
 				"delve", -- go debugger
 			},
 		},
