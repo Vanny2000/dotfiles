@@ -137,5 +137,8 @@ export SASL_PATH=/opt/homebrew/opt/cyrus-sasl/lib/sasl2
 export ANDROID_HOME="$HOME/Library/Android/sdk"                                                                                                        
 export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"                                       
 
+#firebase
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+
 # Zoxide
 eval "$(zoxide init zsh)"
