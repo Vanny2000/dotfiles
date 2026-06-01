@@ -1,2 +1,3 @@
 .DS_STORE
 .serena
+colima/.config/colima/*/daemon/
