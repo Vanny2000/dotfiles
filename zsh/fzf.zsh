@@ -32,7 +32,7 @@ export FZF_CTRL_T_OPTS="--preview '$_FZF_PREVIEW_CMD'"
 _fzf_file_no_hidden() {
   local cmd result mime opener
   cmd="${FZF_DEFAULT_COMMAND/--hidden /}"
-  result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") || return
+  result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") || { zle reset-prompt; return }
 
   mime=$(file --mime-type -b -- "$result")
   case "$mime" in
