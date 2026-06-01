@@ -17,15 +17,33 @@ export FZF_DEFAULT_OPTS='
   --preview-window=right:65%:wrap:border-left
 '
 
-export _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'
+# Preview dispatcher: images via chafa, text via bat, fallback to file metadata
+export _FZF_PREVIEW_CMD='
+  mime=$(file --mime-type -b -- {});
+  case "$mime" in
+    image/*) chafa -f symbols -s "${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}" -- {} ;;
+    text/*|application/json|application/xml|application/javascript|inode/x-empty)
+      bat --color=always --style=plain,numbers --line-range=:500 -- {} ;;
+    *) file -- {} ;;
+  esac'
 export FZF_CTRL_T_OPTS="--preview '$_FZF_PREVIEW_CMD'"
 
-# Ctrl+F: file picker excluding hidden files
+# Ctrl+F: file picker — text files open in $EDITOR, others in the system handler
 _fzf_file_no_hidden() {
-  local cmd result
+  local cmd result mime opener
   cmd="${FZF_DEFAULT_COMMAND/--hidden /}"
-  result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") \
-    && LBUFFER+="$result"  # LBUFFER is the text left of the cursor
-  zle reset-prompt
+  result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") || return
+
+  mime=$(file --mime-type -b -- "$result")
+  case "$mime" in
+    text/*|application/json|application/xml|application/javascript|inode/x-empty)
+      opener="${EDITOR:-nvim}" ;;
+    *)
+      # macOS: open; Linux: xdg-open
+      opener=$(command -v open || command -v xdg-open) ;;
+  esac
+
+  BUFFER="$opener ${(q)result}"
+  zle accept-line
 }
 zle -N _fzf_file_no_hidden
