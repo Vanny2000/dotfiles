@@ -38,3 +38,9 @@ alias n='nvim'
 
 # claude
 alias cc="claude --dangerously-skip-permissions"
+
+# tailscale
+alias ts="tailscale"
+
+# hledger
+alias hl="hledger"
