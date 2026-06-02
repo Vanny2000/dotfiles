@@ -11,3 +11,4 @@ zsh/local.zsh
 # zsh compiled files
 zsh/.zcompdump*
 zsh/*.zwc
+zsh/.zcompcache

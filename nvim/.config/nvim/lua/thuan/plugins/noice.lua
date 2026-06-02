@@ -13,22 +13,6 @@ return {
 		routes = {
 			{
 				filter = {
-					event = "notify",
-					kind = "error",
-					find = "Execution error!", -- This will catch all Soil-related errors
-				},
-				opts = { skip = true },
-			},
-			{
-				filter = {
-					event = "notify",
-					kind = "info",
-					find = "server started", -- This will catch all Soil-related errors
-				},
-				opts = { skip = true },
-			},
-			{
-				filter = {
 					event = "msg_show",
 					kind = "",
 					find = "written",
