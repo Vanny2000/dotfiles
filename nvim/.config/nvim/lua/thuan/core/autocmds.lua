@@ -13,9 +13,9 @@ create_autocmd("TextYankPost", {
 
 -- Close help window with 'q'
 
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "help" },
-  callback = function()
-    vim.keymap.set("n", "q", "<cmd>quit<cr>", { buffer = true, silent = true })
-  end,
+create_autocmd("FileType", {
+	pattern = { "help" },
+	callback = function()
+		vim.keymap.set("n", "q", "<cmd>quit<cr>", { buffer = true, silent = true })
+	end,
 })
