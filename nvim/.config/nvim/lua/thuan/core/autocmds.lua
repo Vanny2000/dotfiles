@@ -19,3 +19,23 @@ create_autocmd("FileType", {
 		vim.keymap.set("n", "q", "<cmd>quit<cr>", { buffer = true, silent = true })
 	end,
 })
+
+vim.filetype.add({
+	extension = {
+		yml = function(path)
+			return path:match("ansible") and "yaml.ansible" or "yaml"
+		end,
+		yaml = function(path)
+			return path:match("ansible") and "yaml.ansible" or "yaml"
+		end,
+	},
+	pattern = {
+		[".*/playbooks/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/tasks/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/handlers/.*%.ya?ml"] = "yaml.ansible",
+		[".*/roles/.*/meta/.*%.ya?ml"] = "yaml.ansible",
+		[".*/group_vars/.*%.ya?ml"] = "yaml.ansible",
+		[".*/host_vars/.*%.ya?ml"] = "yaml.ansible",
+		[".*%.ansible%.ya?ml"] = "yaml.ansible",
+	},
+})

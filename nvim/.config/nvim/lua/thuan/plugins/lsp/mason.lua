@@ -18,6 +18,7 @@ return {
 				"intelephense",
 				"gopls",
 				"astro",
+				"ansiblels",
 			},
 		},
 		dependencies = {
@@ -52,6 +53,7 @@ return {
 				"taplo", -- toml formatter
 				"goimports", -- go formatter
 				"delve", -- go debugger
+				"ansible-lint", -- ansible linter (used by ansiblels)
 			},
 		},
 		dependencies = {
