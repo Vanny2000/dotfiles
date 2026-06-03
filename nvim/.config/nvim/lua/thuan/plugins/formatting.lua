@@ -20,6 +20,7 @@ return {
 				toml = { "taplo" },
 				php = { "pint" },
 				blade = { "blade-formatter", "prettier", stop_after_first = true },
+				sql = { "sql_formatter", stop_after_first = true },
 			},
 			formatters = {
 				biome = { require_cwd = true },
@@ -28,7 +29,7 @@ return {
 				lsp_format = "fallback",
 			},
 			format_on_save = function(bufnr)
-				local ignore_filetypes = { "sql", "yaml", "yml" }
+				local ignore_filetypes = { "yaml", "yml" }
 				if vim.tbl_contains(ignore_filetypes, vim.bo[bufnr].filetype) then
 					return
 				end

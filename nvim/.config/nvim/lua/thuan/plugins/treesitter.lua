@@ -33,8 +33,9 @@ return {
 				"go",
 				"blade",
 				"astro",
-        "ledger",
+				"ledger",
 				"dart",
+				"toml",
 			}
 
 			-- Only install parsers that are missing (avoids reinstall on every startup)
@@ -48,51 +49,15 @@ return {
 				require("nvim-treesitter").install(to_install)
 			end
 
-			-- Filetypes that should get treesitter highlight / fold / indent.
-			-- These map to the parsers above (note: tsx -> typescriptreact, vimdoc -> help, etc.)
-			local filetypes = {
-				"json",
-				"javascript",
-				"javascriptreact",
-				"typescript",
-				"typescriptreact",
-				"yaml",
-				"html",
-				"css",
-				"prisma",
-				"markdown",
-				"svelte",
-				"graphql",
-				"bash",
-				"sh",
-				"zsh",
-				"lua",
-				"vim",
-				"dockerfile",
-				"gitignore",
-				"query",
-				"help",
-				"c",
-				"php",
-				"python",
-				"http",
-				"vue",
-				"go",
-				"blade",
-				"astro",
-        "ledger",
-				"dart",
-			}
-
 			vim.api.nvim_create_autocmd("FileType", {
-				pattern = filetypes,
-				callback = function()
-					-- syntax highlighting (Neovim core)
+				callback = function(args)
+					local lang = vim.treesitter.language.get_lang(args.match)
+					if not lang or not pcall(vim.treesitter.language.add, lang) then
+						return
+					end
 					pcall(vim.treesitter.start)
-					-- folds (Neovim core)
 					vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 					vim.wo.foldmethod = "expr"
-					-- indentation (nvim-treesitter)
 					vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 				end,
 			})
