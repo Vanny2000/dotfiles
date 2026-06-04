@@ -2,15 +2,69 @@
 vim.keymap.set("t", ",,", "<c-\\><c-n>")
 -- Word lists for dynamic name generation
 local adjectives = {
-	"swift", "lazy", "async", "static", "atomic", "cosmic", "hyper", "mega", "nano", "turbo",
-	"dark", "bright", "silent", "loud", "fast", "slow", "hot", "cold", "wild", "calm",
-	"crypto", "quantum", "neural", "stealth", "phantom", "shadow", "ghost", "cyber", "neon", "void",
+	"swift",
+	"lazy",
+	"async",
+	"static",
+	"atomic",
+	"cosmic",
+	"hyper",
+	"mega",
+	"nano",
+	"turbo",
+	"dark",
+	"bright",
+	"silent",
+	"loud",
+	"fast",
+	"slow",
+	"hot",
+	"cold",
+	"wild",
+	"calm",
+	"crypto",
+	"quantum",
+	"neural",
+	"stealth",
+	"phantom",
+	"shadow",
+	"ghost",
+	"cyber",
+	"neon",
+	"void",
 }
 
 local nouns = {
-	"lambda", "kernel", "daemon", "socket", "buffer", "node", "thread", "pixel", "byte", "spark",
-	"pulse", "flux", "core", "matrix", "cipher", "nexus", "forge", "vault", "link", "wave",
-	"storm", "blade", "prism", "orbit", "quark", "photon", "vector", "tensor", "beacon", "relay",
+	"lambda",
+	"kernel",
+	"daemon",
+	"socket",
+	"buffer",
+	"node",
+	"thread",
+	"pixel",
+	"byte",
+	"spark",
+	"pulse",
+	"flux",
+	"core",
+	"matrix",
+	"cipher",
+	"nexus",
+	"forge",
+	"vault",
+	"link",
+	"wave",
+	"storm",
+	"blade",
+	"prism",
+	"orbit",
+	"quark",
+	"photon",
+	"vector",
+	"tensor",
+	"beacon",
+	"relay",
 }
 
 local state = {
@@ -266,14 +320,13 @@ vim.api.nvim_create_user_command("FloaterminalPrev", prev_terminal, {})
 vim.api.nvim_create_user_command("FloaterminalRename", rename_terminal, {})
 
 -- Normal mode keymaps
-vim.keymap.set({"n","t"}, "<leader>tt", toggle_terminal, { desc = "Toggle Floating Terminal" })
+vim.keymap.set({ "n", "t" }, "<leader>tt", toggle_terminal, { desc = "Toggle Floating Terminal" })
 
 -- Terminal mode keymaps for navigation
 vim.keymap.set("t", "<C-j>", prev_terminal, { desc = "Previous Terminal" })
 vim.keymap.set("t", "<C-k>", next_terminal, { desc = "Next Terminal" })
 vim.keymap.set("t", "<C-x>", delete_terminal, { desc = "Delete Current Terminal" })
-vim.keymap.set("t", "<C-t>", add_terminal, { desc = "New Floating Terminal" })
-vim.keymap.set("t", "<C-r>", rename_terminal, { desc = "Rename Current Terminal" })
+vim.keymap.set("t", "<C-n>", add_terminal, { desc = "New Floating Terminal" })
 
 -- Expose terminal status for statusline (e.g., lualine)
 _G.floaterm_status = function()
