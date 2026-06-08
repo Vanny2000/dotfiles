@@ -13,5 +13,5 @@ return {
 	},
 	dependencies = { { "nvim-mini/mini.icons", opts = {} } },
 	lazy = false,
-	vim.keymap.set("n", "<leader>o", "<cmd>Oil<cr>", { desc = "Open oil" }),
+	vim.keymap.set("n", "o", "<cmd>Oil<cr>", { desc = "Open oil" }),
 }
