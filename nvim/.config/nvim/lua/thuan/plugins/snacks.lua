@@ -7,7 +7,7 @@ return {
 	opts = {
 		bigfile = {
 			enable = true,
-			size = 1024 * 200, -- 200 KB
+      size = 1024 * 200 -- 200 KB
 		},
 		image = {
 			enable = true,
@@ -38,7 +38,7 @@ return {
 			},
 		},
 		explorer = {
-			enable = false,
+			enable = true,
 		},
 		notifier = {
 			enable = true,
@@ -93,7 +93,7 @@ return {
 			end,
 			desc = "Lazyjira",
 		},
-		{
+    {
 			"<leader>ld",
 			function()
 				Snacks.terminal("lazydocker")
@@ -101,6 +101,13 @@ return {
 			desc = "Lazydocker",
 		},
 		-- File Explorer
+		{
+			"<leader>ee",
+			function()
+				Snacks.explorer()
+			end,
+			desc = " Toggle file explorer",
+		},
 		{
 			"<leader>ec",
 			function()
