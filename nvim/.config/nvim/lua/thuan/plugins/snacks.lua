@@ -7,7 +7,7 @@ return {
 	opts = {
 		bigfile = {
 			enable = true,
-      size = 1024 * 200 -- 200 KB
+			size = 1024 * 200, -- 200 KB
 		},
 		image = {
 			enable = true,
@@ -93,7 +93,7 @@ return {
 			end,
 			desc = "Lazyjira",
 		},
-    {
+		{
 			"<leader>ld",
 			function()
 				Snacks.terminal("lazydocker")
@@ -159,13 +159,6 @@ return {
 				Snacks.picker.diagnostics()
 			end,
 			desc = "[f]ind [d]iagnostic[s]",
-		},
-		{
-			"<leader>ft",
-			function()
-				Snacks.picker.todo_comments()
-			end,
-			desc = "[f]ind [d]iagnostic[s] in [c]urrent buffer",
 		},
 		-- Notifier
 		{

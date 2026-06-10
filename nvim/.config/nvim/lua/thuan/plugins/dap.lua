@@ -10,12 +10,29 @@ return {
 		local dap = require("dap")
 		local dapui = require("dapui")
 		local dap_go = require("dap-go")
+		local dap_vt = require("nvim-dap-virtual-text")
 
+		dap_vt.setup({
+			all_references = true,
+			only_first_definition = false,
+			display_callback = function(variable, _, _, _, options)
+				if variable.type == "uninitialized" or variable.value == "uninitialized" then
+					return nil
+				end
+				local value = variable.value:gsub("%s+", " ")
+				if #value > 40 then
+					value = value:sub(1, 39) .. "…"
+				end
+				if options.virt_text_pos == "inline" then
+					return " = " .. value
+				end
+				return variable.name .. " = " .. value
+			end,
+		})
 		-- PHP / Xdebug configuration
 		dap.adapters.php = {
 			type = "executable",
-			command = "node",
-			args = { os.getenv("HOME") .. "/vscode-php-debug/out/phpDebug.js" },
+			command = vim.fn.exepath("php-debug-adapter"),
 		}
 
 		dap.configurations.php = {
@@ -117,52 +134,12 @@ return {
 			layouts = {
 				{
 					elements = {
-						{
-							id = "scopes",
-							size = 0.5,
-						},
-						{
-							id = "breakpoints",
-							size = 0.25,
-						},
-						-- {
-						-- 	id = "stacks",
-						-- 	size = 0.25,
-						-- },
-						-- {
-						-- 	id = "watches",
-						-- 	size = 0.25,
-						-- },
-					},
-					position = "left",
-					size = 40,
-				},
-				{
-					elements = {
-						{
-							id = "repl",
-							size = 1,
-						},
-						-- {
-						-- 	id = "console",
-						-- 	size = 0.5,
-						-- },
+						{ id = "repl", size = 0.8 },
+						{ id = "watches", size = 0.2 },
 					},
 					position = "bottom",
-					size = 10,
+					size = 12,
 				},
-			},
-			mappings = {
-				edit = "e",
-				expand = { "<CR>", "<2-LeftMouse>" },
-				open = "o",
-				remove = "d",
-				repl = "r",
-				toggle = "t",
-			},
-			render = {
-				indent = 1,
-				max_value_lines = 100,
 			},
 		})
 
@@ -171,13 +148,13 @@ return {
 			dapui.open()
 		end
 
-    dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
-    end
+		dap.listeners.before.event_terminated["dapui_config"] = function()
+			dapui.close()
+		end
 
-    dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
-    end
+		dap.listeners.before.event_exited["dapui_config"] = function()
+			dapui.close()
+		end
 
 		-- Debugging keymaps
 		local keymap = vim.keymap
@@ -208,14 +185,13 @@ return {
 			dap.clear_breakpoints()
 			dapui.close()
 			dap.terminate()
+			dap_vt.toggle()
 		end, { desc = "Reset Debug Session", unpack(opts) })
 
 		-- Restart session without clearing breakpoints
-		keymap.set(
-			"n",
-			debug_prefix .. "x",
-			dap.restart,
-			{ desc = "Reset Debug Session w/o clearing breakpoints", unpack(opts) }
-		)
+		keymap.set("n", debug_prefix .. "x", function()
+			dap.restart()
+			dap_vt.toggle()
+		end, { desc = "Reset Debug Session w/o clearing breakpoints", unpack(opts) })
 	end,
 }

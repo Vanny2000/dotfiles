@@ -53,6 +53,7 @@ return {
 				"taplo", -- toml formatter
 				"goimports", -- go formatter
 				"delve", -- go debugger
+				"php-debug-adapter", -- php/xdebug debugger
 				"ansible-lint", -- ansible linter (used by ansiblels)
 			},
 		},
