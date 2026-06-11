@@ -134,8 +134,9 @@ return {
 			layouts = {
 				{
 					elements = {
-						{ id = "repl", size = 0.8 },
-						{ id = "watches", size = 0.2 },
+						{ id = "repl", size = 0.4 },
+						{ id = "watches", size = 0.3 },
+						{ id = "scopes", size = 0.3 },
 					},
 					position = "bottom",
 					size = 12,
