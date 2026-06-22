@@ -29,5 +29,6 @@
   },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
   "voiceEnabled": true
 }

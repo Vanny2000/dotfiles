@@ -6,3 +6,6 @@ export LEDGER_FILE="$HOME/finance/main.journal"
 
 # colima default profile
 export COLIMA_PROFILE=dev
+
+# deployer
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
