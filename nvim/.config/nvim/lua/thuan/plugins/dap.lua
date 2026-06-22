@@ -32,7 +32,7 @@ return {
 		-- PHP / Xdebug configuration
 		dap.adapters.php = {
 			type = "executable",
-			command = vim.fn.exepath("php-debug-adapter"),
+			command = vim.fn.stdpath("data") .. "/mason/bin/php-debug-adapter",
 		}
 
 		dap.configurations.php = {
