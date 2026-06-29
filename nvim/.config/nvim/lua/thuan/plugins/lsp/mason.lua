@@ -15,7 +15,7 @@ return {
 				"prismals",
 				"pyright",
 				"eslint",
-				"intelephense",
+				"phpantom_lsp",
 				"gopls",
 				"astro",
 				"ansiblels",
