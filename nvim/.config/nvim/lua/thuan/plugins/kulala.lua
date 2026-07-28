@@ -238,7 +238,23 @@ return {
 		-- Kulala UI keymaps; override with custom keymaps as required
 		-- (see docs or lua/kulala/config/keymaps.lua)
 		---@type boolean|table
-		kulala_keymaps = true,
+		kulala_keymaps = {
+			-- Keep <C-h>/<C-l> free for split navigation; use <Tab>/<S-Tab> to cycle panes.
+			["Previous tab"] = {
+				"<S-Tab>",
+				function()
+					require("kulala.ui").show_previous_tab()
+				end,
+				mode = { "n" },
+			},
+			["Next tab"] = {
+				"<Tab>",
+				function()
+					require("kulala.ui").show_next_tab()
+				end,
+				mode = { "n" },
+			},
+		},
 		--[[
         {
           ["Show headers"] = { "H", function() require("kulala.ui").show_headers() end, },

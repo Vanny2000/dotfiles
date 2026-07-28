@@ -25,7 +25,10 @@
         "ctrl+shift+-": "chat:undo",
         "ctrl+g": "chat:externalEditor",
         "ctrl+s": "chat:stash",
-        "ctrl+v": "chat:imagePaste"
+        "ctrl+v": "chat:imagePaste",
+        "ctrl+x ctrl+k": null,
+        "ctrl+x ctrl+e": null,
+        "ctrl+x": "chat:killAgents"
       }
     },
     {
@@ -96,7 +99,8 @@
     {
       "context": "Task",
       "bindings": {
-        "ctrl+b": "task:background"
+        "ctrl+b": "task:background",
+        "ctrl+x ctrl+b": null
       }
     },
     {

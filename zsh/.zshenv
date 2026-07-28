@@ -32,3 +32,6 @@ export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship.toml"
 # ---------- PATH ----------
 # Personal binaries/scripts
 export PATH="$HOME/.local/bin:$PATH"
+
+# Rust/cargo binaries
+export PATH="$HOME/.cargo/bin:$PATH"
