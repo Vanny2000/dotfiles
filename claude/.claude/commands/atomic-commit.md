@@ -14,13 +14,12 @@ Run `git status` and `git diff HEAD` (or `git diff` + `git diff --cached` if som
 
 Also run `git log --oneline -5` to understand the recent commit style and conventions used in this project.
 
-
 ## Step 2: Analyze and group changes
 
 Carefully read through ALL the diffs. Group the changes into logical units based on:
 
 - **Feature additions** — new functionality, new files, new endpoints
-- **Bug fixes** — corrections to existing behavior  
+- **Bug fixes** — corrections to existing behavior
 - **Refactors** — restructuring without behavior change (rename, extract, move)
 - **Style / formatting** — whitespace, linting, code style only
 - **Tests** — new or updated test files
@@ -39,16 +38,13 @@ Before making any commits, output a numbered plan like this:
 PROPOSED COMMIT PLAN
 ====================
 1. [type(scope)]: short description
-   Files: file1.ts, file2.ts (lines X–Y in file3.ts)
-   Reason: <why these belong together>
 
 2. [type(scope)]: short description
-   Files: ...
-   Reason: ...
 ...
 ```
 
 Order commits so that:
+
 - Foundational changes (types, interfaces, config) come first
 - Dependent changes come after what they depend on
 - Tests follow the code they test
@@ -64,18 +60,13 @@ For each commit in the plan:
 4. Commit using **Conventional Commits** format:
    ```
    <type>(<scope>): <short imperative description>
-
-   <optional body: what changed and why, not how>
-
-   <optional footer: BREAKING CHANGE, Closes #issue>
    ```
 
 **Allowed types:** `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`, `perf`, `build`, `ci`
 
 **Rules for the commit message:**
+
 - Subject line: max 72 chars, imperative mood ("add" not "added"), no period at end
-- Body: explain the *why*, not the *what* — the diff already shows the what
-- Reference issues if detectable from context (e.g., `Closes #123`)
 
 ## Step 5: Confirm and summarize
 
@@ -97,7 +88,7 @@ COMMITS CREATED
 - **Never mix** a bug fix with a refactor in the same commit, even if they touch the same file
 - **Never mix** dependency updates with feature code
 - **NEVER** include the Co-Author.
-- **Skip** committing generated files (e.g., `dist/`, `*.lock`) unless they are the *only* change in a logical unit
+- **Skip** committing generated files (e.g., `dist/`, `*.lock`) unless they are the _only_ change in a logical unit
 - If $ARGUMENTS is provided, treat it as a scope hint or focus area (e.g., "only commit auth-related changes", "scope: payments module")
 - If you are unsure whether two changes belong together, **split them** — atomic is better than bundled
 - If a change looks like it might be debug/test code that shouldn't be committed (e.g., `console.log`, hardcoded mock data, `TODO: remove this`), flag it and ask before committing
