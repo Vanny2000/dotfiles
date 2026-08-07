@@ -5,7 +5,9 @@
     "KENER_URL": "https://status.shoprunback.com"
   },
   "model": "opus[1m]",
-  "worktree": { "bgIsolation": "none" },
+  "worktree": {
+    "bgIsolation": "none"
+  },
   "statusLine": {
     "type": "command",
     "command": "npx -y ccstatusline@latest",
@@ -20,7 +22,8 @@
     "lua-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "shopify-ai-toolkit@claude-plugins-official": true
+    "shopify-ai-toolkit@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "laravel": {
