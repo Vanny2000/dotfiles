@@ -1,0 +1,4 @@
+#!/bin/sh
+# Thin wrapper so quoted_reply can name a bare command: aerc's template `exec`
+# takes a command name, not a command line. See aerc-md2html --stash.
+exec aerc-md2html --stash "$@"

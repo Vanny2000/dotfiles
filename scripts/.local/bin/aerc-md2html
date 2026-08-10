@@ -1,0 +1,312 @@
+#!/usr/bin/env python3
+"""Markdown + rich-HTML support for aerc, in two modes.
+
+Default — a multipart-converter. aerc.conf:
+
+    [multipart-converters]
+    text/html=~/.local/bin/aerc-md2html
+
+aerc pipes the composed text/plain body in and takes text/html out. The body is
+rendered as markdown by pandoc, the plain-text signature is swapped for its HTML
+twin in place, and any `> ` quote is replaced by the original message's own
+markup. Accounts with no signature-file (gmail) just get markdown -> HTML.
+
+--stash — a drop-in for aerc's `html` filter, called from the quoted_reply
+template (via the aerc-quote-stash wrapper, since template `exec` takes a bare
+command name). Emits the same text dump `html` would, and additionally files
+the original's sanitized markup away for the converter to find.
+
+The two halves talk to each other content-addressed: the stash keys the original
+by a hash of its own text dump, and the converter re-derives that key from the
+quote sitting in the body. aerc hands the converter only the composed *text*, so
+there is no message id to pass along, and a "most recent original" cache could
+quote the wrong message into a real reply. Deriving the key from the quoted text
+makes that impossible — a miss simply falls back to quoting the text verbatim.
+"""
+
+import hashlib
+import html
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from html.parser import HTMLParser
+
+CONFIG = os.path.join(
+    os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"), "aerc"
+)
+SIG_TXT = os.path.join(CONFIG, "signatures", "srb-signature.txt")
+SIG_HTML = os.path.join(CONFIG, "signatures", "srb-signature.html")
+
+CACHE = os.path.join(
+    os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"),
+    "aerc",
+    "quoted-html",
+)
+CACHE_TTL = 14 * 24 * 3600
+
+# Matches recipients' clients (Outlook here) rather than pandoc's default.
+BODY_STYLE = "font-family:Aptos,Calibri,Helvetica,sans-serif;font-size:12pt;color:rgb(0,0,0);"
+QUOTE_STYLE = "margin:0 0 0 0.8ex;padding-left:1ex;border-left:2px solid rgb(200,200,200);color:rgb(100,100,100);"
+# No colour override: the nested original brings its own.
+RICH_QUOTE_STYLE = "margin:0 0 0 0.8ex;padding-left:1ex;border-left:2px solid rgb(200,200,200);"
+
+# -smart keeps `--`, `...` and quotes literal, which matters for the CLI
+# snippets and API keys that end up in these mails. +hard_line_breaks keeps the
+# newlines you typed. The `> ` block never reaches pandoc — see quoted().
+PANDOC = [
+    "pandoc",
+    "-f",
+    "markdown-smart+hard_line_breaks",
+    "-t",
+    "html",
+    "--wrap=none",
+    "--email-obfuscation=none",
+]
+
+
+def read(path):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return f.read().replace("\r\n", "\n")
+    except OSError:
+        return ""
+
+
+# --------------------------------------------------------------------------
+# the content-addressed handshake
+# --------------------------------------------------------------------------
+
+
+def quote_key(text):
+    """Key a quote by its text, ignoring whitespace the `quote` filter touches.
+
+    aerc's quote turns a blank line into a bare ">" and may drop trailing
+    spaces, so both sides rstrip every line before hashing.
+    """
+    lines = [line.rstrip() for line in text.strip().splitlines()]
+    return hashlib.sha1("\n".join(lines).strip("\n").encode("utf-8")).hexdigest()
+
+
+def cache_path(key):
+    return os.path.join(CACHE, key + ".html")
+
+
+# --------------------------------------------------------------------------
+# converter
+# --------------------------------------------------------------------------
+
+
+def markdown(text):
+    if not text.strip():
+        return ""
+    out = subprocess.run(
+        PANDOC, input=text, capture_output=True, text=True, check=True
+    ).stdout.strip()
+    # Inline rather than a <style> block: Outlook and Gmail are unreliable
+    # about honouring stylesheets in the head.
+    return out.replace("<blockquote>", f'<blockquote style="{QUOTE_STYLE}">')
+
+
+def quoted(text):
+    """Render a `> ` block, preferring the original's own HTML.
+
+    On a cache miss we quote the text verbatim: it is emphatically not markdown,
+    so its indentation would become code blocks and any *, # or _ in a
+    colleague's mail would be eaten as emphasis.
+    """
+    stripped = "\n".join(re.sub(r"^> ?", "", l) for l in text.split("\n"))
+
+    original = read(cache_path(quote_key(stripped)))
+    if original:
+        return f'<blockquote style="{RICH_QUOTE_STYLE}">{original}</blockquote>'
+
+    lines = []
+    for line in stripped.rstrip("\n").split("\n"):
+        line = html.escape(line)
+        # HTML collapses runs of spaces; the dump uses them to align tables.
+        line = re.sub(r"^ +| {2,}", lambda m: "&nbsp;" * len(m.group()), line)
+        lines.append(line)
+    return f'<blockquote style="{QUOTE_STYLE}">' + "<br>\n".join(lines) + "</blockquote>"
+
+
+def render(text):
+    """Markdown for your prose, verbatim for anything from the quote on."""
+    split = re.search(r"^>", text, re.M)
+    if not split:
+        return markdown(text)
+    return "\n".join(
+        p for p in (markdown(text[: split.start()]), quoted(text[split.start() :])) if p
+    )
+
+
+def split_signature(body):
+    """Return (before, after) around the plain-text signature, or (body, None)."""
+    sig = read(SIG_TXT).strip()
+    if not sig or sig not in body:
+        return body, None
+    start = body.rindex(sig)
+    end = start + len(sig)
+    # Swallow the "-- " delimiter aerc prepends on new messages; the reply
+    # template strips it already, so it may not be there.
+    head = re.sub(r"--[ \t]*\n\Z", "", body[:start])
+    return head, body[end:]
+
+
+def convert():
+    # aerc's compose buffer is CRLF (see [compose].lf-editor); without this the
+    # signature match below fails and the plain signature leaks into the HTML.
+    body = sys.stdin.read().replace("\r\n", "\n")
+    before, after = split_signature(body)
+
+    parts = [render(before)]
+    if after is not None:
+        sig = re.sub(r"\A\s*(<!--.*?-->\s*)*", "", read(SIG_HTML), flags=re.S)
+        parts.append(sig.strip())
+        parts.append(render(after))
+
+    print(
+        "<!DOCTYPE html>\n"
+        '<html>\n<head><meta charset="utf-8"></head>\n'
+        f'<body style="{BODY_STYLE}">\n'
+        + "\n".join(p for p in parts if p)
+        + "\n</body>\n</html>"
+    )
+
+
+# --------------------------------------------------------------------------
+# --stash: the `html` filter, plus a copy of the original for later
+# --------------------------------------------------------------------------
+
+
+def html_filter(raw):
+    """Run the original through aerc's own `html` filter, so the dump the key is
+    derived from matches the template's byte for byte."""
+    cmd = shutil.which("html")
+    if not cmd:
+        for pattern in (
+            "/opt/homebrew/libexec/aerc/filters/html",
+            "/usr/libexec/aerc/filters/html",
+            "/usr/local/libexec/aerc/filters/html",
+            "/usr/share/aerc/filters/html",
+        ):
+            if os.path.exists(pattern):
+                cmd = pattern
+                break
+    argv = (
+        [cmd]
+        if cmd
+        else ["w3m", "-T", "text/html", "-I", "UTF-8", "-dump", "-cols", "100"]
+    )
+    return subprocess.run(argv, input=raw, capture_output=True, text=True).stdout
+
+
+# Dropped along with everything inside them. <style> matters most: mail from
+# Outlook carries global rules like `div {width:100%!important}` that would
+# otherwise escape the blockquote and restyle the whole reply.
+DROP_TREE = {"script", "style", "head", "title"}
+# Unwrapped — the children are kept, the tag itself is not.
+DROP_TAG = {"html", "body", "meta", "link", "base"}
+VOID = {
+    "area", "base", "br", "col", "embed", "hr", "img", "input",
+    "link", "meta", "param", "source", "track", "wbr",
+}
+
+
+class _Sanitizer(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.out = []
+        self.depth = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in DROP_TREE:
+            self.depth += 1
+            return
+        if self.depth or tag in DROP_TAG:
+            return
+        rendered = ""
+        for name, value in attrs:
+            # Event handlers execute in the recipient's client; never forward.
+            if name.lower().startswith("on"):
+                continue
+            if value is None:
+                rendered += f" {name}"
+                continue
+            if name.lower() == "href" and value.strip().lower().startswith("javascript:"):
+                continue
+            rendered += f' {name}="{html.escape(value, quote=True)}"'
+        self.out.append(f"<{tag}{rendered}>")
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        if tag in DROP_TREE:
+            self.depth = max(0, self.depth - 1)
+            return
+        if self.depth or tag in DROP_TAG or tag in VOID:
+            return
+        self.out.append(f"</{tag}>")
+
+    def handle_data(self, data):
+        if not self.depth:
+            self.out.append(data)
+
+    def handle_entityref(self, name):
+        if not self.depth:
+            self.out.append(f"&{name};")
+
+    def handle_charref(self, name):
+        if not self.depth:
+            self.out.append(f"&#{name};")
+
+    def handle_comment(self, data):
+        pass
+
+
+def sanitize(raw):
+    """Reduce a whole original message to a safe fragment fit for nesting."""
+    parser = _Sanitizer()
+    parser.feed(raw)
+    parser.close()
+    fragment = "".join(parser.out)
+    # Outlook pads its bodies with runs of empty divs and <br>; trim the edges.
+    return re.sub(r"(?:\s|<br\s*/?>|<div>\s*</div>)+\Z", "", fragment.strip())
+
+
+def prune():
+    cutoff = time.time() - CACHE_TTL
+    try:
+        for name in os.listdir(CACHE):
+            path = os.path.join(CACHE, name)
+            if os.path.getmtime(path) < cutoff:
+                os.unlink(path)
+    except OSError:
+        pass
+
+
+def stash():
+    raw = sys.stdin.read()
+    dump = html_filter(raw)
+    sys.stdout.write(dump)
+    # Stashing must never cost you a reply: any failure here just means the
+    # quote falls back to text.
+    try:
+        fragment = sanitize(raw)
+        if fragment:
+            os.makedirs(CACHE, exist_ok=True)
+            prune()
+            with open(cache_path(quote_key(dump)), "w", encoding="utf-8") as f:
+                f.write(fragment)
+    except Exception:
+        pass
+
+
+if __name__ == "__main__":
+    try:
+        stash() if "--stash" in sys.argv[1:] else convert()
+    except subprocess.CalledProcessError as e:
+        sys.exit(f"aerc-md2html: pandoc failed: {e.stderr.strip()}")
