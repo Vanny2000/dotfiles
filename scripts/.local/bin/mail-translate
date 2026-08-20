@@ -1,0 +1,54 @@
+#!/bin/sh
+# Translate a mail part piped in by aerc's :pipe.
+#
+#   mail-translate [-a] [lang]
+#     -a     include the quoted replies too (default: this message only)
+#     lang   target language code, default en
+#
+# Bound to T (English) and t (prompt) in [view] (binds.conf). The selected part
+# is raw, and with [viewer].alternatives preferring text/html that means markup
+# rather than prose, so HTML is flattened before it reaches the translator.
+set -eu
+
+all=0
+case ${1:-} in
+	-a | --all)
+		all=1
+		shift
+		;;
+esac
+lang="${1:-en}"
+
+body=$(cat)
+
+case $body in
+	*'<html'* | *'<HTML'* | *'<body'* | *'<div'* | *'<p>'*)
+		body=$(printf '%s' "$body" | w3m -dump -T text/html -I UTF-8) ;;
+esac
+
+# Stop at the first sign of quoted history. Outlook marks it with a rule and
+# localised De:/Envoyé: headers, other clients with "> " or "On ... wrote:".
+if [ "$all" -eq 0 ]; then
+	trimmed=$(printf '%s' "$body" | awk '
+		/^[[:space:]]*>/                                  { exit }
+		/^[[:space:]]*On .*wrote:[[:space:]]*$/           { exit }
+		/^[[:space:]]*-----[[:space:]]*Original Message/  { exit }
+		/^_____/                                          { exit }
+		/^━━━/                                            { exit }
+		/^[[:space:]]*(De|From|Von|Da)[[:space:]]*:[[:space:]]/  { exit }
+		/^[[:space:]]*(Envoyé|Sent|Gesendet|Inviato)[[:space:]]*:/ { exit }
+		/^--[[:space:]]*$/                                { exit }
+		{ print }
+	')
+	# A reply with nothing above the quote would otherwise translate to
+	# nothing at all; fall back to the whole part.
+	[ -n "$(printf '%s' "$trimmed" | tr -d '[:space:]')" ] && body=$trimmed
+fi
+
+# -no-auto suppresses the "Showing translation for:" autocorrect banner.
+if [ -t 1 ]; then
+	# aerc runs this in a terminal tab, so page it.
+	printf '%s' "$body" | trans -b -no-auto ":$lang" | less -R
+else
+	printf '%s' "$body" | trans -b -no-auto -no-ansi ":$lang"
+fi
