@@ -13,6 +13,7 @@ return {
 		local dap_vt = require("nvim-dap-virtual-text")
 
 		dap_vt.setup({
+			enabled = false,
 			all_references = true,
 			only_first_definition = false,
 			display_callback = function(variable, _, _, _, options)

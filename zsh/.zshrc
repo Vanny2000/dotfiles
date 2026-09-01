@@ -40,8 +40,6 @@ setopt NUMERIC_GLOB_SORT  # sort file10 after file9, not after file1
 # LF_ICONS=$(cat ~/.config/lf/icons | tr '\n' ':')
 # export LF_ICONS
 
-# Initialize zoxide
-eval "$(zoxide init zsh)"
 
 # =========================================================
 # Completion
@@ -114,3 +112,9 @@ source "$ZDOTDIR/prompt.zsh"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+# =========================================================
+# Zoxide
+# =========================================================
+export _ZO_DOCTOR=0
+eval "$(zoxide init zsh --cmd cd)"
