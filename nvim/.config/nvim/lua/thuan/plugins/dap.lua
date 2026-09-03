@@ -187,13 +187,17 @@ return {
 			dap.clear_breakpoints()
 			dapui.close()
 			dap.terminate()
-			dap_vt.toggle()
+			if dap_vt.is_enabled() then
+				dap_vt.toggle()
+			end
 		end, { desc = "Reset Debug Session", unpack(opts) })
 
 		-- Restart session without clearing breakpoints
 		keymap.set("n", debug_prefix .. "x", function()
 			dap.restart()
-			dap_vt.toggle()
+			if dap_vt.is_enabled() then
+				dap_vt.toggle()
+			end
 		end, { desc = "Reset Debug Session w/o clearing breakpoints", unpack(opts) })
 	end,
 }
