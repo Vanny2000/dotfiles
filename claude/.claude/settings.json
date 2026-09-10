@@ -25,7 +25,8 @@
     "shopify-ai-toolkit@claude-plugins-official": true,
     "mattpocock-skills@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "google-slides-mcp@matteoantoci-plugins": true
   },
   "extraKnownMarketplaces": {
     "laravel": {
@@ -33,8 +34,15 @@
         "source": "github",
         "repo": "laravel/agent-skills"
       }
+    },
+    "matteoantoci-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "matteoantoci/claude-plugins"
+      }
     }
   },
+  "feedbackDrafts": "off",
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",

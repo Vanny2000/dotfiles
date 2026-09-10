@@ -1,0 +1,80 @@
+#!/bin/bash
+# Prompt for a filename whenever macOS drops a new screenshot in ~/Screenshots.
+# Driven by the com.kongvanny.screenshot-rename launchd agent (WatchPaths).
+
+set -u
+
+dir="$HOME/Screenshots"
+lock="$dir/.rename.lock"
+tag="com.kongvanny.screenshot-renamed"
+
+[ -d "$dir" ] || exit 0
+
+mkdir "$lock" 2>/dev/null || exit 0
+trap 'rmdir "$lock" 2>/dev/null' EXIT
+
+ask() {
+  local esc
+  esc=$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  osascript <<EOF
+tell application "System Events"
+  activate
+  set r to display dialog "Name this screenshot:" default answer "$esc" ¬
+    with title "Screenshot" buttons {"Cancel", "Save"} default button "Save" ¬
+    with icon note giving up after 60
+  if gave up of r then return ""
+  return text returned of r
+end tell
+EOF
+}
+
+while IFS= read -r f; do
+  base=${f##*/}
+  ext=${base##*.}
+  stem=${base%.*}
+
+  case $(printf '%s' "$ext" | tr 'A-Z' 'a-z') in
+    png|jpg|jpeg|heic|gif|tiff|pdf|mov) ;;
+    *) continue ;;
+  esac
+
+  xattr -p "$tag" "$f" >/dev/null 2>&1 && continue
+
+  # let screencapture finish writing before we touch the file
+  prev=-1
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    size=$(stat -f%z "$f" 2>/dev/null) || break
+    [ "$size" -gt 0 ] && [ "$size" = "$prev" ] && break
+    prev=$size
+    sleep 0.2
+  done
+  [ -f "$f" ] || continue
+
+  new=$(ask "$stem")
+  if [ -z "$new" ]; then
+    xattr -w "$tag" 1 "$f" 2>/dev/null
+    continue
+  fi
+
+  new=$(printf '%s' "$new" | tr '/:' '--')
+  new=${new#"${new%%[![:space:]]*}"}
+  new=${new%"${new##*[![:space:]]}"}
+  case "$new" in .*) new="_${new#.}" ;; esac
+  # don't end up with foo.png.png
+  case $(printf '%s' "$new" | tr 'A-Z' 'a-z') in
+    *".$(printf '%s' "$ext" | tr 'A-Z' 'a-z')") new=${new%.*} ;;
+  esac
+  [ -n "$new" ] || { xattr -w "$tag" 1 "$f" 2>/dev/null; continue; }
+
+  target="$dir/$new.$ext"
+  n=1
+  while [ -e "$target" ] && [ "$target" != "$f" ]; do
+    target="$dir/$new-$n.$ext"
+    n=$((n + 1))
+  done
+
+  if [ "$target" != "$f" ]; then
+    mv -n "$f" "$target" || continue
+  fi
+  xattr -w "$tag" 1 "$target" 2>/dev/null
+done < <(find "$dir" -maxdepth 1 -type f -mtime -10m 2>/dev/null)

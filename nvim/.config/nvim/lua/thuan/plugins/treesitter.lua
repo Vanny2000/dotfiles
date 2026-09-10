@@ -36,6 +36,8 @@ return {
 				"ledger",
 				"dart",
 				"toml",
+				"terraform",
+				"hcl",
 			}
 
 			-- Only install parsers that are missing (avoids reinstall on every startup)

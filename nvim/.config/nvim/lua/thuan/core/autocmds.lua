@@ -39,3 +39,9 @@ vim.filetype.add({
 		[".*%.ansible%.ya?ml"] = "yaml.ansible",
 	},
 })
+
+vim.filetype.add({
+	extension = {
+		tofu = "terraform",
+	},
+})

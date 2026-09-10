@@ -45,3 +45,6 @@ keymap.set("n", "G", "Gzz", { desc = "Move to top and center the view" })
 
 -- env operations
 keymap.set("n", "<leader>fe", "<cmd>e .env<CR>", { desc = "Open/Create .env file" })
+
+-- opening other tui apps inside a floating terminal
+keymap.set("n", "<leader>gl", "<cmd>FloaterminalNew glab-tui<CR>", { desc = "Open glab-tui in floating terminal" })

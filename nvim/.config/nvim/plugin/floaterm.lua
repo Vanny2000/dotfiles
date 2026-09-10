@@ -209,22 +209,31 @@ local function toggle_terminal()
 	end
 end
 
--- Add a new terminal
-local function add_terminal()
-	-- Ensure window is open
-	if not vim.api.nvim_win_is_valid(state.win) then
+-- Add a new terminal, optionally running a command (e.g. `FloaterminalNew glab-tui`)
+local function add_terminal(cmd)
+	if cmd == "" then
+		cmd = nil
+	end
+
+	-- Without a command, opening from a closed window just re-opens the last terminal
+	if not cmd and not vim.api.nvim_win_is_valid(state.win) then
 		toggle_terminal()
 		return
 	end
 
+	if not vim.api.nvim_win_is_valid(state.win) then
+		local result = create_floating_window({})
+		state.win = result.win
+	end
+
 	-- Create new terminal buffer
 	local buf = vim.api.nvim_create_buf(false, true)
-	local name = get_unique_name()
+	local name = cmd and cmd:match("%S+") or get_unique_name()
 	table.insert(state.terminals, { buf = buf, name = name })
 	state.current_index = #state.terminals
 
 	vim.api.nvim_win_set_buf(state.win, buf)
-	vim.cmd.terminal()
+	vim.cmd.terminal(cmd)
 	-- Update buffer reference after terminal() creates new buffer
 	state.terminals[state.current_index].buf = vim.api.nvim_get_current_buf()
 
@@ -313,7 +322,9 @@ end
 
 -- Commands and keymaps
 vim.api.nvim_create_user_command("Floaterminal", toggle_terminal, {})
-vim.api.nvim_create_user_command("FloaterminalNew", add_terminal, {})
+vim.api.nvim_create_user_command("FloaterminalNew", function(opts)
+	add_terminal(opts.args)
+end, { nargs = "*", complete = "shellcmd" })
 vim.api.nvim_create_user_command("FloaterminalDelete", delete_terminal, {})
 vim.api.nvim_create_user_command("FloaterminalNext", next_terminal, {})
 vim.api.nvim_create_user_command("FloaterminalPrev", prev_terminal, {})

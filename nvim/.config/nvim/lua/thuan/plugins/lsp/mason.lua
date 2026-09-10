@@ -19,6 +19,7 @@ return {
 				"gopls",
 				"astro",
 				"ansiblels",
+				"tofu_ls",
 			},
 		},
 		dependencies = {
