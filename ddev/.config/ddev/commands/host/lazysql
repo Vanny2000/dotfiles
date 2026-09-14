@@ -1,21 +1,34 @@
 #!/usr/bin/env bash
-## Description: Open lazysql on the current project database
-## Usage: lazysql [database]
-## Example: "ddev lazysql"
+## Description: Open lazysql on a project database
+## Usage: lazysql [database] [-p project]
+## Example: "ddev lazysql\nddev lazysql -p auth\nddev lazysql mydb -p auth"
+## Flags: [{"Name":"project","Shorthand":"p","Usage":"project name (default: current dir)","Type":"string"}]
 ## HostBinaryExists: /opt/homebrew/bin/lazysql
-## DBTypes: mysql,mariadb,postgres
+## CanRunGlobally: true
 
-if [ "${DDEV_PROJECT_STATUS}" != "running" ] && [ -z "$no_recursion" ]; then
-  echo "Project ${DDEV_PROJECT} is not running, starting it"
-  ddev start || exit $?
-  no_recursion=true ddev "$(basename "$0")" "$@"
-  exit $?
+PROJECT="${DDEV_PROJECT}"
+DATABASE=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p|--project) PROJECT="$2"; shift ;;
+    --project=*)  PROJECT="${1#*=}" ;;
+    *)            DATABASE="$1" ;;
+  esac
+  shift
+done
+[ -z "$PROJECT" ] && { echo "Not in a project; use -p <project>"; exit 1; }
+
+if [ "$(ddev describe -j "$PROJECT" | jq -r .raw.status)" != "running" ]; then
+  echo "Project ${PROJECT} is not running, starting it"
+  ddev start "$PROJECT" || exit $?
 fi
 
-DATABASE="${1:-db}"
-case "${DDEV_DATABASE_FAMILY}" in
-  postgres) URL="postgres://db:db@127.0.0.1:${DDEV_HOST_DB_PORT}/${DATABASE}?sslmode=disable" ;;
-  *)        URL="mysql://db:db@127.0.0.1:${DDEV_HOST_DB_PORT}/${DATABASE}" ;;
+eval "$(ddev describe -j "$PROJECT" | jq -r '.raw.dbinfo | "PORT=\(.published_port) FAMILY=\(.database_type) DBNAME=\(.dbname) USER=\(.username) PASS=\(.password)"')"
+DATABASE="${DATABASE:-$DBNAME}"
+
+case "$FAMILY" in
+  postgres) URL="postgres://${USER}:${PASS}@127.0.0.1:${PORT}/${DATABASE}?sslmode=disable" ;;
+  *)        URL="mysql://${USER}:${PASS}@tcp(127.0.0.1:${PORT})/${DATABASE}" ;;
 esac
 
 exec lazysql "$URL"
