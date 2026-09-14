@@ -28,7 +28,7 @@ DATABASE="${DATABASE:-$DBNAME}"
 
 case "$FAMILY" in
   postgres) URL="postgres://${USER}:${PASS}@127.0.0.1:${PORT}/${DATABASE}?sslmode=disable" ;;
-  *)        URL="mysql://${USER}:${PASS}@tcp(127.0.0.1:${PORT})/${DATABASE}" ;;
+  *)        URL="mysql://${USER}:${PASS}@127.0.0.1:${PORT}/${DATABASE}" ;;
 esac
 
 exec lazysql "$URL"
