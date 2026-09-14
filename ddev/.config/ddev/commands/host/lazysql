@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+## Description: Open lazysql on the current project database
+## Usage: lazysql [database]
+## Example: "ddev lazysql"
+## HostBinaryExists: /opt/homebrew/bin/lazysql
+## DBTypes: mysql,mariadb,postgres
+
+if [ "${DDEV_PROJECT_STATUS}" != "running" ] && [ -z "$no_recursion" ]; then
+  echo "Project ${DDEV_PROJECT} is not running, starting it"
+  ddev start || exit $?
+  no_recursion=true ddev "$(basename "$0")" "$@"
+  exit $?
+fi
+
+DATABASE="${1:-db}"
+case "${DDEV_DATABASE_FAMILY}" in
+  postgres) URL="postgres://db:db@127.0.0.1:${DDEV_HOST_DB_PORT}/${DATABASE}?sslmode=disable" ;;
+  *)        URL="mysql://db:db@127.0.0.1:${DDEV_HOST_DB_PORT}/${DATABASE}" ;;
+esac
+
+exec lazysql "$URL"

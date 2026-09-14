@@ -1,0 +1,3 @@
+no_tui: true
+performance_mode: mutagen
+share_default_provider: cloudflared
